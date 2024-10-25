@@ -1,0 +1,9 @@
+<library path="curobo_rviz">
+
+  <class name="curobo_rviz/RvizArgsPanel"
+         type="curobo_rviz::RvizArgsPanel"
+         base_class_type="rviz_common::Panel">
+    <description>Curobo Rviz Panel</description>
+  </class>
+
+</library>
