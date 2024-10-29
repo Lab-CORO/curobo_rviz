@@ -6,8 +6,9 @@ namespace curobo_rviz
     : Panel{parent}
     , ui_(std::make_unique<Ui::gui>())
     , node_{nullptr}
-    , count_button_1_{0}
-    , count_button_2_{0}
+    , max_attempts_{0}
+    , timeout_{0.0}
+    , time_dilation_factor_{0.0}
   {
     // Extend the widget with all attributes and children from UI file
     ui_->setupUi(this);
@@ -17,11 +18,13 @@ namespace curobo_rviz
         {"--ros-args", "--remap", "__node:=rviz_push_button_node", "--"});
     node_ = std::make_shared<rclcpp::Node>("_", options);
 
-    button1_pub_ = node_->create_publisher<std_msgs::msg::Bool>("button1", 1);
-    button2_pub_ = node_->create_publisher<std_msgs::msg::Bool>("button2", 1);
-
     // Prepare msg
     msg_.data = true;
+
+    // Connect SpinBox and DoubleSpinBox to slots
+    connect(ui_->spinBox_1, SIGNAL(valueChanged(int)), this, SLOT(updateMaxAttempts(int)));
+    connect(ui_->doubleSpinBox_1, SIGNAL(valueChanged(double)), this, SLOT(updateTimeout(double)));
+    connect(ui_->doubleSpinBox_2, SIGNAL(valueChanged(double)), this, SLOT(updateTimeDilationFactor(double)));
   }
 
   RvizArgsPanel::~RvizArgsPanel()
@@ -30,39 +33,49 @@ namespace curobo_rviz
     void RvizArgsPanel::load(const rviz_common::Config &config)
     {
       Panel::load(config);
-      if (auto push_button_config = config.mapGetChild({"PushButton"}); push_button_config.isValid())
+      int max_attempts;
+      float timeout, time_dilation;
+
+      if (max_attempts = config.mapGetInt("max_attempts", &max_attempts))
       {
-        if (QVariant count_button_1 {0}; push_button_config.mapGetValue({"count_button_1"}, &count_button_1))
-        {
-          RCLCPP_INFO_STREAM(node_->get_logger(), "Button 1 was pressed " << count_button_1.toDouble() << " the last time.");
-        }
-        if (QVariant count_button_2 {0}; push_button_config.mapGetValue({"count_button_2"}, &count_button_2))
-        {
-          RCLCPP_INFO_STREAM(node_->get_logger(), "Button 2 was pressed " << count_button_2.toDouble() << " the last time.");
-        }
+        ui_->spinBox_1->setValue(max_attempts);
+      }
+
+      if (timeout = config.mapGetFloat("timeout", &timeout))
+      {
+        ui_->doubleSpinBox_1->setValue(timeout);
+      }
+
+      if (time_dilation = config.mapGetFloat("time_dilation_factor", &time_dilation))
+      {
+          ui_->doubleSpinBox_2->setValue(time_dilation);
       }
     }
 
     void RvizArgsPanel::save(rviz_common::Config config) const
     {
       Panel::save(config);
-      rviz_common::Config push_button_config = config.mapMakeChild({"PushButton"});
-      push_button_config.mapSetValue({"count_button_1"}, {count_button_1_});
-      push_button_config.mapSetValue({"count_button_2"}, {count_button_2_});
+      config.mapSetValue("max_attempts", max_attempts_);
+      config.mapSetValue("timeout", timeout_);
+      config.mapSetValue("time_dilation_factor", time_dilation_factor_);
     }
 
-    void RvizArgsPanel::on_pushButton1_clicked()
+    void RvizArgsPanel::updateMaxAttempts(int value)
     {
-      RCLCPP_INFO_STREAM(node_->get_logger(), "Published to button1 topic!");
-      button1_pub_->publish(msg_);
-      ui_->label_1->setText(QString::fromStdString({std::string{"Button 1 was clicked "} + std::to_string(++count_button_1_)}));
+        max_attempts_ = value;
+        RCLCPP_INFO(node_->get_logger(), "Max attempts set to %d", max_attempts_);
     }
 
-    void RvizArgsPanel::on_pushButton2_clicked()
+    void RvizArgsPanel::updateTimeout(double value)
     {
-      RCLCPP_INFO_STREAM(node_->get_logger(), "Published to button2 topic!");
-      button2_pub_->publish(msg_);
-      ui_->label_2->setText(QString::fromStdString({std::string{"Button 2 was clicked "} + std::to_string(++count_button_2_)}));
+        timeout_ = value;
+        RCLCPP_INFO(node_->get_logger(), "Timeout set to %.2f", timeout_);
+    }
+
+    void RvizArgsPanel::updateTimeDilationFactor(double value)
+    {
+        time_dilation_factor_ = value;
+        RCLCPP_INFO(node_->get_logger(), "Time dilation factor set to %.2f", time_dilation_factor_);
     }
 
 } // curobo_rviz

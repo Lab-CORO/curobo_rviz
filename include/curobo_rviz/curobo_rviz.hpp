@@ -3,6 +3,8 @@
 // ROS2
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/u_int8.hpp>
+#include <std_msgs/msg/float32.hpp>
 // RVIZ2
 #include <rviz_common/panel.hpp>
 // Qt
@@ -30,17 +32,20 @@ namespace curobo_rviz
     virtual void save(rviz_common::Config config) const override;
 
   private Q_SLOTS:
-    void on_pushButton1_clicked();
-    void on_pushButton2_clicked();
+    void updateMaxAttempts(int value);
+    void updateTimeout(double value);
+    void updateTimeDilationFactor(double value);
 
   private:
     std::unique_ptr<Ui::gui> ui_;
     rclcpp::Node::SharedPtr node_;
-    uint16_t count_button_1_, count_button_2_;
+    int max_attempts_;
+    float timeout_, time_dilation_factor_;
 
   protected:
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr button1_pub_;
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr button2_pub_;
     std_msgs::msg::Bool msg_;
+    rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr max_attempts_pub_;
+    rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr timeout_pub_;
+    rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr time_dilation_factor_pub_;
   };
 } // curobo_rviz
