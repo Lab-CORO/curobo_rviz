@@ -6,6 +6,7 @@ namespace curobo_rviz
     : Panel{parent}
     , ui_(std::make_unique<Ui::gui>())
     , node_{nullptr}
+    , param_client_{nullptr}
     , max_attempts_{0}
     , timeout_{0.0}
     , time_dilation_factor_{0.0}
@@ -17,6 +18,10 @@ namespace curobo_rviz
     auto options = rclcpp::NodeOptions().arguments(
         {"--ros-args", "--remap", "__node:=rviz_push_button_node", "--"});
     node_ = std::make_shared<rclcpp::Node>("_", options);
+    param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "curobo_gen_traj");
+    while (!param_client_->wait_for_service(std::chrono::seconds(3))) {
+      RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
+    }
 
     // Prepare msg
     msg_.data = true;
@@ -33,23 +38,13 @@ namespace curobo_rviz
     void RvizArgsPanel::load(const rviz_common::Config &config)
     {
       Panel::load(config);
-      int max_attempts;
-      float timeout, time_dilation;
+      auto parameters = param_client_->get_parameters({"max_attempts", "timeout", "time_dilation_factor"});
+      RCLCPP_INFO(node_->get_logger(), "Parameters received: %ld", parameters.size());
 
-      if (max_attempts = config.mapGetInt("max_attempts", &max_attempts))
-      {
-        ui_->spinBox_1->setValue(max_attempts);
-      }
-
-      if (timeout = config.mapGetFloat("timeout", &timeout))
-      {
-        ui_->doubleSpinBox_1->setValue(timeout);
-      }
-
-      if (time_dilation = config.mapGetFloat("time_dilation_factor", &time_dilation))
-      {
-          ui_->doubleSpinBox_2->setValue(time_dilation);
-      }
+      // set initial values in UI to the values from the parameter server
+      ui_->spinBox_1->setValue(parameters[0].as_int());
+      ui_->doubleSpinBox_1->setValue(parameters[1].as_double());
+      ui_->doubleSpinBox_2->setValue(parameters[2].as_double());
     }
 
     void RvizArgsPanel::save(rviz_common::Config config) const
@@ -76,6 +71,14 @@ namespace curobo_rviz
     {
         time_dilation_factor_ = value;
         RCLCPP_INFO(node_->get_logger(), "Time dilation factor set to %.2f", time_dilation_factor_);
+    }
+
+    void RvizArgsPanel::on_confirmPushButton_clicked()
+    {
+        while (!param_client_->wait_for_service(std::chrono::seconds(3))) {
+            RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
+        }
+        RCLCPP_INFO(node_->get_logger(), "Confirm button clicked.");
     }
 
 } // curobo_rviz

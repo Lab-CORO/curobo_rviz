@@ -26,6 +26,7 @@ find_package(ament_cmake REQUIRED)
 
 set(dependencies_pkgs
   rclcpp
+  rcl_interfaces
   std_msgs
   rviz_common
   Qt5Core

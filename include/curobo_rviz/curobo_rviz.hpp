@@ -35,10 +35,13 @@ namespace curobo_rviz
     void updateMaxAttempts(int value);
     void updateTimeout(double value);
     void updateTimeDilationFactor(double value);
+    void updateParameters();
+    void on_confirmPushButton_clicked();
 
   private:
     std::unique_ptr<Ui::gui> ui_;
     rclcpp::Node::SharedPtr node_;
+    rclcpp::SyncParametersClient::SharedPtr param_client_;
     int max_attempts_;
     float timeout_, time_dilation_factor_;
 
