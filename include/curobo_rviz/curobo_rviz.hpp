@@ -36,6 +36,8 @@ namespace curobo_rviz
     void updateMaxAttempts(int value);
     void updateTimeout(double value);
     void updateTimeDilationFactor(double value);
+    void updateVoxelSize(double value);
+    void updateCollisionActivationDistance(double value);
     void updateParameters();
     void on_confirmPushButton_clicked();
 
@@ -44,12 +46,6 @@ namespace curobo_rviz
     rclcpp::Node::SharedPtr node_;
     rclcpp::SyncParametersClient::SharedPtr param_client_;
     int max_attempts_;
-    float timeout_, time_dilation_factor_;
-
-  protected:
-    std_msgs::msg::Bool msg_;
-    rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr max_attempts_pub_;
-    rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr timeout_pub_;
-    rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr time_dilation_factor_pub_;
+    float timeout_, time_dilation_factor_, voxel_size_, collision_activation_distance_;
   };
 } // curobo_rviz
