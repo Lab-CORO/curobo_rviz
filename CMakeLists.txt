@@ -28,6 +28,7 @@ set(dependencies_pkgs
   rclcpp
   rcl_interfaces
   std_msgs
+  std_srvs
   rviz_common
   Qt5Core
   Qt5Gui

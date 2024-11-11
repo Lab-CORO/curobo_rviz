@@ -5,6 +5,7 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/u_int8.hpp>
 #include <std_msgs/msg/float32.hpp>
+#include <std_srvs/srv/trigger.hpp>
 // RVIZ2
 #include <rviz_common/panel.hpp>
 // Qt
