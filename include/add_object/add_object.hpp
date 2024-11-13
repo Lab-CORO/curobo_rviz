@@ -12,5 +12,3 @@ protected:
   void processMessage(const curobo_msgs::srv::AddObject::message msg) override;
 };
 }  // namespace add_object
-
-#endif  // add_object
