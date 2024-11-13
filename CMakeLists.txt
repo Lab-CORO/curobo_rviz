@@ -23,6 +23,9 @@ set(CMAKE_AUTOMOC ON)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(rviz_common REQUIRED)
+find_package(curobo_msgs REQUIRED)
 
 set(dependencies_pkgs
   rclcpp
@@ -44,11 +47,13 @@ set(library_name curobo_rviz)
 # Define source file
 set(${PROJECT_NAME}_SRCS
   src/curobo_rviz.cpp
+  src/add_object.cpp
 )
 
 # Define header file
 set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/curobo_rviz.hpp
+  include/add_object/add_object.hpp
 )
 
 # Define ui file
@@ -59,6 +64,9 @@ set(${PROJECT_NAME}_UIS
 # Generate header for ui
 qt5_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+qt5_wrap_cpp(MOC_FILES
+  include/add_object/add_object.hpp
+)
 
 add_library(${library_name} SHARED
   ${${PROJECT_NAME}_SRCS}

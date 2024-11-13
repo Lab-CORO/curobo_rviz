@@ -7,3 +7,13 @@
   </class>
 
 </library>
+
+<library path="add_object">
+
+  <class name="add_object/AddObjectDisplay"
+         type="add_object::AddObjectDisplay"
+         base_class_type="rviz_common::Display">
+    <description>Add Object Display</description>
+  </class>
+  
+</library>
