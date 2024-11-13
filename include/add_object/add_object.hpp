@@ -1,5 +1,5 @@
 #include <rviz_common/message_filter_display.hpp>
-#include <curobo_msgs/srv/AddObject.hpp>
+#include <curobo_msgs/srv/add_object.hpp>
 
 namespace add_object
 {
