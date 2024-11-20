@@ -14,6 +14,7 @@ namespace curobo_rviz
     , time_dilation_factor_{0.0}
     , voxel_size_{0.0}
     , collision_activation_distance_{0.0}
+    , timerConfirmChangesMessage_{nullptr}
   {
     // Extend the widget with all attributes and children from UI file
     ui_->setupUi(this);
@@ -26,7 +27,7 @@ namespace curobo_rviz
     while (!param_client_->wait_for_service(std::chrono::seconds(3))) {
       RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
     }
-    // call Trigger service update_motion_gen_config
+    // create Trigger service update_motion_gen_config
     motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/update_motion_gen_config");
     motion_gen_config_request_ = std::make_shared<std_srvs::srv::Trigger::Request>();
 
@@ -36,6 +37,10 @@ namespace curobo_rviz
     connect(ui_->doubleSpinBoxTimeDilationFactor, SIGNAL(valueChanged(double)), this, SLOT(updateTimeDilationFactor(double)));
     connect(ui_->doubleSpinBoxVoxelSize, SIGNAL(valueChanged(double)), this, SLOT(updateVoxelSize(double)));
     connect(ui_->doubleSpinBoxCollisionActivationDistance, SIGNAL(valueChanged(double)), this, SLOT(updateCollisionActivationDistance(double)));
+    
+    // create a timer to show labelConfirmChangesMessage for 5 seconds
+    timerConfirmChangesMessage_ = new QTimer(this);
+    connect(timerConfirmChangesMessage_, SIGNAL(timeout()), ui_->labelConfirmChangesMessage, SLOT(clear()));
   }
 
   RvizArgsPanel::~RvizArgsPanel()
@@ -139,6 +144,10 @@ namespace curobo_rviz
             } else {
                 RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
             }
+            // show Trigger message in UI
+            QString msg = result->message.c_str();
+            ui_->labelConfirmChangesMessage->setText(msg);
+            timerConfirmChangesMessage_->start(5000); // 5 seconds
         } else {
             RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
         }
