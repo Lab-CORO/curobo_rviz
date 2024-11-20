@@ -7,6 +7,8 @@ namespace curobo_rviz
     , ui_(std::make_unique<Ui::gui>())
     , node_{nullptr}
     , param_client_{nullptr}
+    , motion_gen_config_client_{nullptr}
+    , motion_gen_config_request_{nullptr}
     , max_attempts_{0}
     , timeout_{0.0}
     , time_dilation_factor_{0.0}
@@ -24,6 +26,9 @@ namespace curobo_rviz
     while (!param_client_->wait_for_service(std::chrono::seconds(3))) {
       RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
     }
+    // call Trigger service update_motion_gen_config
+    motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/update_motion_gen_config");
+    motion_gen_config_request_ = std::make_shared<std_srvs::srv::Trigger::Request>();
 
     // Connect SpinBox and DoubleSpinBox to slots
     connect(ui_->spinBoxMaxAttempts, SIGNAL(valueChanged(int)), this, SLOT(updateMaxAttempts(int)));
@@ -120,14 +125,11 @@ namespace curobo_rviz
                                        rclcpp::Parameter("collision_activation_distance", collision_activation_distance_)});
         RCLCPP_INFO(node_->get_logger(), "Parameters set:\voxel_size: %.2f, collision_activation_distance: %.2f", voxel_size_, collision_activation_distance_);
         
-        // call Trigger service update_motion_gen_config
-        rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr client = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/update_motion_gen_config");
-        auto request = std::make_shared<std_srvs::srv::Trigger::Request>();
 
-        while (!client->wait_for_service(std::chrono::seconds(1))) {
+        while (!motion_gen_config_client_->wait_for_service(std::chrono::seconds(1))) {
             RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
         }
-        auto result = client->async_send_request(request);
+        auto result = motion_gen_config_client_->async_send_request(motion_gen_config_request_);
         RCLCPP_INFO(node_->get_logger(), "Service call sent.");
         
         if (rclcpp::spin_until_future_complete(node_, result) == rclcpp::FutureReturnCode::SUCCESS) {
