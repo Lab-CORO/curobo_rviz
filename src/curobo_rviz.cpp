@@ -129,11 +129,16 @@ namespace curobo_rviz
         while (!motion_gen_config_client_->wait_for_service(std::chrono::seconds(1))) {
             RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
         }
-        auto result = motion_gen_config_client_->async_send_request(motion_gen_config_request_);
+        auto future = motion_gen_config_client_->async_send_request(motion_gen_config_request_);
         RCLCPP_INFO(node_->get_logger(), "Service call sent.");
         
-        if (rclcpp::spin_until_future_complete(node_, result) == rclcpp::FutureReturnCode::SUCCESS) {
-            RCLCPP_INFO(node_->get_logger(), "Service call successful.");
+        if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
+            auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
+            if (result->success) {
+                RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
+            } else {
+                RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
+            }
         } else {
             RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
         }
