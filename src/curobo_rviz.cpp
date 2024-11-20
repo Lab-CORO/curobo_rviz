@@ -26,11 +26,11 @@ namespace curobo_rviz
     }
 
     // Connect SpinBox and DoubleSpinBox to slots
-    connect(ui_->spinBox_1, SIGNAL(valueChanged(int)), this, SLOT(updateMaxAttempts(int)));
-    connect(ui_->doubleSpinBox_1, SIGNAL(valueChanged(double)), this, SLOT(updateTimeout(double)));
-    connect(ui_->doubleSpinBox_2, SIGNAL(valueChanged(double)), this, SLOT(updateTimeDilationFactor(double)));
-    connect(ui_->doubleSpinBox_3, SIGNAL(valueChanged(double)), this, SLOT(updateVoxelSize(double)));
-    connect(ui_->doubleSpinBox_4, SIGNAL(valueChanged(double)), this, SLOT(updateCollisionActivationDistance(double)));
+    connect(ui_->spinBoxMaxAttempts, SIGNAL(valueChanged(int)), this, SLOT(updateMaxAttempts(int)));
+    connect(ui_->doubleSpinBoxTimeout, SIGNAL(valueChanged(double)), this, SLOT(updateTimeout(double)));
+    connect(ui_->doubleSpinBoxTimeDilationFactor, SIGNAL(valueChanged(double)), this, SLOT(updateTimeDilationFactor(double)));
+    connect(ui_->doubleSpinBoxVoxelSize, SIGNAL(valueChanged(double)), this, SLOT(updateVoxelSize(double)));
+    connect(ui_->doubleSpinBoxCollisionActivationDistance, SIGNAL(valueChanged(double)), this, SLOT(updateCollisionActivationDistance(double)));
   }
 
   RvizArgsPanel::~RvizArgsPanel()
@@ -43,11 +43,11 @@ namespace curobo_rviz
       RCLCPP_INFO(node_->get_logger(), "Parameters received: %ld", parameters.size());
 
       // set initial values in UI to the values from the parameter server
-      ui_->spinBox_1->setValue(parameters[0].as_int());
-      ui_->doubleSpinBox_1->setValue(parameters[1].as_double());
-      ui_->doubleSpinBox_2->setValue(parameters[2].as_double());
-      ui_->doubleSpinBox_3->setValue(parameters[3].as_double());
-      ui_->doubleSpinBox_4->setValue(parameters[4].as_double());
+      ui_->spinBoxMaxAttempts->setValue(parameters[0].as_int());
+      ui_->doubleSpinBoxTimeout->setValue(parameters[1].as_double());
+      ui_->doubleSpinBoxTimeDilationFactor->setValue(parameters[2].as_double());
+      ui_->doubleSpinBoxVoxelSize->setValue(parameters[3].as_double());
+      ui_->doubleSpinBoxCollisionActivationDistance->setValue(parameters[4].as_double());
     }
 
     void RvizArgsPanel::save(rviz_common::Config config) const
