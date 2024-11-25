@@ -6,14 +6,16 @@
     <description>Curobo Rviz Panel</description>
   </class>
 
-</library>
+  <class name="add_objects/AddObjectsPanel"
+          type="add_objects::AddObjectsPanel"
+          base_class_type="rviz_common::Panel">
+      <description>Add Objects Panel</description>
+  </class>
 
-<library path="add_object">
-
-  <class name="add_object/AddObjectDisplay"
-         type="add_object::AddObjectDisplay"
+  <class name="add_objects/AddObjectsDisplay"
+         type="add_objects::AddObjectsDisplay"
          base_class_type="rviz_common::Display">
-    <description>Add Object Display</description>
+    <description>Add Objects Display</description>
   </class>
   
 </library>

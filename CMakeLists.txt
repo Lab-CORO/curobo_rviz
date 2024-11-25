@@ -48,14 +48,16 @@ set(library_name curobo_rviz)
 
 # Define source file
 set(${PROJECT_NAME}_SRCS
+  src/add_objects_display.cpp
+  src/add_objects_panel.cpp
   src/curobo_rviz.cpp
-  src/add_object.cpp
 )
 
 # Define header file
 set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/curobo_rviz.hpp
-  include/add_object/add_object.hpp
+  include/${PROJECT_NAME}/add_objects_display.hpp
+  include/${PROJECT_NAME}/add_objects_panel.hpp
 )
 
 # Define ui file
@@ -76,7 +78,7 @@ add_library(${library_name} SHARED
   ${${PROJECT_NAME}_MOCS} 
 )
 ament_target_dependencies(${library_name} ${dependencies_pkgs})
-target_link_libraries(${library_name} rviz_common::rviz_common)
+target_link_libraries(${library_name} Qt5::Widgets rviz_common::rviz_common)
 
 # I prefer the Qt signals and slots to avoid defining "emit", "slots",
 # etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here
