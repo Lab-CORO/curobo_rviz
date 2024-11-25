@@ -2,6 +2,9 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/display.hpp>
+#include <rviz_common/properties/color_property.hpp>
+#include <rviz_rendering/objects/shape.hpp>
+#include <curobo_msgs/srv/add_object.hpp>
 #include <QtWidgets>
 
 namespace add_objects
@@ -12,8 +15,18 @@ namespace add_objects
     public:
         explicit AddObjectsDisplay();
         ~AddObjectsDisplay();
+    protected:
+        void onInitialize() override;
+        void onEnable() override;
+        void onDisable() override;
+        void update(float wall_dt, float ros_dt) override;
+        void processMessage(const curobo_msgs::srv::AddObject::Response::SharedPtr msg);
+        void updateStyle();
+
+        std::unique_ptr<rviz_rendering::Shape> shape_;
+        std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
     };
-} // add_objects
+}
 
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(add_objects::AddObjectsDisplay, rviz_common::Display)

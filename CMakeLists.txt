@@ -36,6 +36,8 @@ set(dependencies_pkgs
   Qt5Core
   Qt5Gui
   Qt5Widgets
+  curobo_msgs
+  geometry_msgs
 )
 
 foreach(pkg IN LISTS dependencies_pkgs)
