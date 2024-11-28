@@ -2,6 +2,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/panel.hpp>
+#include <curobo_msgs/srv/add_object.hpp>
 #include <QtWidgets>
 
 # include <ui_curobo_rviz_panel.h>
