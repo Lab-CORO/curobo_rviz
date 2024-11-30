@@ -102,3 +102,6 @@ namespace add_objects_panel
 
     }
 } // add_objects_panel
+
+#include <pluginlib/class_list_macros.hpp>
+PLUGINLIB_EXPORT_CLASS(add_objects_panel::AddObjectsPanel, rviz_common::Panel)

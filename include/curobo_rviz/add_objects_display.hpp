@@ -26,6 +26,3 @@ namespace add_objects_display
         std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
     };
 }
-
-#include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(add_objects_display::AddObjectsDisplay, rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>)
