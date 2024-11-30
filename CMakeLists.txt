@@ -92,7 +92,7 @@ target_link_libraries(curobo_rviz Qt5::Widgets rviz_common::rviz_common)
 # I prefer the Qt signals and slots to avoid defining "emit", "slots",
 # etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here
 # e.g. http://muddyazian.blogspot.de/2012/04/getting-qt-app-working-with-boost-using.html
-target_compile_definitions(curobo_rviz add_objects_display add_objects_panel PRIVATE QT_NO_KEYWORDS)
+target_compile_definitions(curobo_rviz PRIVATE QT_NO_KEYWORDS)
 
 # install
 pluginlib_export_plugin_description_file(rviz_common rviz2_plugin.xml)
