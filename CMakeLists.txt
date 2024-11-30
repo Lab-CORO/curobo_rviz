@@ -87,7 +87,7 @@ target_compile_definitions(add_objects_display PRIVATE QT_NO_KEYWORDS)
 add_library(add_objects_panel SHARED
             src/add_objects_panel.cpp)
 target_include_directories(add_objects_panel PRIVATE include)
-ament_target_dependencies(add_objects_panel depe${dependencies_pkgs}ndencies_pkgs)
+ament_target_dependencies(add_objects_panel ${dependencies_pkgs})
 target_compile_definitions(add_objects_panel PRIVATE QT_NO_KEYWORDS)
 
 #add_library(${library_name} SHARED
