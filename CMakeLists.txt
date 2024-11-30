@@ -1,4 +1,4 @@
-resource/add_panelCmake_minimum_required(VERSION 3.8)
+Cmake_minimum_required(VERSION 3.8)
 project(curobo_rviz)
 
 # Default to C99
