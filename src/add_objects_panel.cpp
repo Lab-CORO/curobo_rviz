@@ -59,7 +59,7 @@ namespace add_objects
                                             "\tmesh_file_path: %s\n"
                                             "\tpose: {position: %f, %f, %f}{orientation: %f, %f, %f}\n"
                                             "\tdimensions: %f, %f, %f\n"
-                                            "\tcolor: %d, %d, %d, %d\n",
+                                            "\tcolor: %f, %f, %f, %f\n",
                                             type, name.c_str(),
                                             mesh_file_path.c_str(),
                                             posX, posY, posZ, orientationX, orientationY, orientationZ, orientationW,
@@ -80,10 +80,10 @@ namespace add_objects
         add_object_request_.dimensions.x = dimX;
         add_object_request_.dimensions.y = dimY;
         add_object_request_.dimensions.z = dimZ;
-        add_object_request_.colorRGBA.r = colorR;
-        add_object_request_.colorRGBA.g = colorG;
-        add_object_request_.colorRGBA.b = colorB;
-        add_object_request_.colorRGBA.a = colorA;
+        add_object_request_.color.r = colorR;
+        add_object_request_.color.g = colorG;
+        add_object_request_.color.b = colorB;
+        add_object_request_.color.a = colorA;
 
         // call Add Objects with parameters
         // TODO: if the call works, call the display. else: error message
