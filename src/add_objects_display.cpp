@@ -13,6 +13,7 @@ namespace add_objects_display
         , shape_{nullptr}
         , color_property_{nullptr}
         , node_{nullptr}
+        , add_object_subscriber_{nullptr}
     {
     }
 
@@ -24,6 +25,12 @@ namespace add_objects_display
     void AddObjectsDisplay::onInitialize()
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::onInitialize()");
+
+        auto options = rclcpp::NodeOptions().arguments(
+        {"--ros-args", "--remap", "__node:=rviz_add_objects_display_node", "--"});
+        node_ = std::make_shared<rclcpp::Node>("_", options);
+
+        add_object_subscriber_ = node_->create_subscriber<curobo_msgs::srv::AddObject_Request>("add_objects_topic");
         
         shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
         
@@ -49,9 +56,27 @@ namespace add_objects_display
             RCLCPP_WARN(rclcpp::get_logger("AddObjectsDisplay"), "Shape is not initialized.");
             return;
         }
-        
-        // shape_->setScale(Ogre::Vector3(msg->dimensions.x, msg->dimensions.y, msg->dimensions.z));
-        // shape_->setPosition(Ogre::Vector3(msg->pose.position.x, msg->pose.position.y, msg->pose.position.z));
+
+        Ogre::Vector3 position;
+        Ogre::Quaternion orientation;
+
+        scene_node_->setPosition(position);
+        scene_node_->setOrientation(orientation);
+
+        shape_->setOrientation(Ogre::Vector3(
+                                request->pose->orientation.x,
+                                request->pose->orientation.y,
+                                request->pose->orientation.z,
+                                request->pose->orientation.w));
+        shape_->setScale(Ogre::Vector3(
+                                request->dimensions.x,
+                                request->dimensions.y,
+                                request->dimensions.z));
+        shape_->setPosition(Ogre::Vector3(
+                                request->pose.position.x,
+                                request->pose.position.y,
+                                request->pose.position.z));
+        color_property_->setColor(QColor(request->color.r, request->color.g, request->color.b));
     }
 
     void AddObjectsDisplay::updateStyle()
