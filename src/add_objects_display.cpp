@@ -9,7 +9,7 @@ namespace add_objects
     using rviz_common::properties::StatusProperty;
     
     AddObjectsDisplay::AddObjectsDisplay()
-        : Display{}
+        : RosTopicDisplay{}
         , shape_{nullptr}
         , color_property_{nullptr}
     {
