@@ -72,30 +72,63 @@ set(${PROJECT_NAME}_UIS
 qt5_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 
-add_library(${library_name} SHARED
-  ${${PROJECT_NAME}_SRCS}
-  ${${PROJECT_NAME}_UIS_H}
-  ${${PROJECT_NAME}_MOCS} 
-)
-ament_target_dependencies(${library_name} ${dependencies_pkgs})
-target_link_libraries(${library_name} Qt5::Widgets rviz_common::rviz_common)
+add_library(curobo_rviz SHARED
+            src/curobo_rviz.cpp)
+target_include_directories(curobo_rviz PRIVATE include)
+ament_target_dependencies(curobo_rviz Qt5::Widgets rviz_common::rviz_common)
+target_compile_definitions(curobo_rviz PRIVATE QT_NO_KEYWORDS)
+
+add_library(add_objects_display SHARED
+            src/add_objects_display.cpp)
+target_include_directories(add_objects_display PRIVATE include)
+ament_target_dependencies(add_objects_display Qt5::Widgets rviz_common::rviz_common)
+target_compile_definitions(add_objects_display PRIVATE QT_NO_KEYWORDS)
+
+add_library(add_objects_panel SHARED
+            src/add_objects_panel.cpp)
+target_include_directories(add_objects_panel PRIVATE include)
+ament_target_dependencies(add_objects_panel Qt5::Widgets rviz_common::rviz_common)
+target_compile_definitions(add_objects_panel PRIVATE QT_NO_KEYWORDS)
+
+#add_library(${library_name} SHARED
+#  ${${PROJECT_NAME}_SRCS}
+#  ${${PROJECT_NAME}_UIS_H}
+#  ${${PROJECT_NAME}_MOCS} 
+#)
+#target_link_libraries(${library_name} Qt5::Widgets rviz_common::rviz_common)
+#ament_target_dependencies(${library_name} ${dependencies_pkgs})
 
 # I prefer the Qt signals and slots to avoid defining "emit", "slots",
 # etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here
 # e.g. http://muddyazian.blogspot.de/2012/04/getting-qt-app-working-with-boost-using.html
-target_compile_definitions(${library_name} PRIVATE QT_NO_KEYWORDS)
+#target_compile_definitions(${library_name} PRIVATE QT_NO_KEYWORDS)
 
 # install
 pluginlib_export_plugin_description_file(rviz_common rviz2_plugin.xml)
 
+set(LIB_TARGETS
+  curobo_rviz
+  add_objects_display
+  add_objects_panel
+)
+
 install(
-  TARGETS ${library_name}
-  EXPORT ${library_name}
+  TARGETS ${LIB_TARGETS}
+  EXPORT curobo_rvizTargets
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
+
+#install(
+#  TARGETS ${library_name}
+#  EXPORT ${library_name}
+#  ARCHIVE DESTINATION lib
+#  LIBRARY DESTINATION lib
+#  RUNTIME DESTINATION bin
+#  INCLUDES DESTINATION include
+#)
 
 install(
   DIRECTORY include/
@@ -114,7 +147,8 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_include_directories(include)
-ament_export_targets(${library_name} HAS_LIBRARY_TARGET)
+ament_export_targets(curobo_rvizTargets HAS_LIBRARY_TARGET)
+#ament_export_targets(${library_name} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${dependencies_pkgs})
 
 ament_package()
