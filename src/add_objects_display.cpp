@@ -10,9 +10,9 @@ namespace add_objects_display
     
     AddObjectsDisplay::AddObjectsDisplay()
         : RosTopicDisplay{}
-        , node_{nullptr}
         , shape_{nullptr}
         , color_property_{nullptr}
+        , node_{nullptr}
     {
     }
 
