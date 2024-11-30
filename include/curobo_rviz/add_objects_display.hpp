@@ -30,7 +30,7 @@ namespace add_objects_display
     
     private:
         rclcpp::Node::SharedPtr node_;
-        rclcpp::Subscriber<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_subscriber_;
+        rclcpp::Subscription<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_subscriber_;
     };
 } // namespace add_objects_display
 
