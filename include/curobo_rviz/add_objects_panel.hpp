@@ -23,8 +23,8 @@ namespace add_objects
     private:
         std::unique_ptr<Ui::gui> ui_;
         rclcpp::Node::SharedPtr node_;
-        rclcpp::Client<curobo_msgs::srv::AddObject>::SharedPtr add_objects_client_;
-        rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_objects_publisher_;
+        rclcpp::Client<curobo_msgs::srv::AddObject>::SharedPtr add_object_client_;
+        rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_publisher_;
     };
 }
 
