@@ -14,7 +14,7 @@
 
   <class name="add_objects/AddObjectsDisplay"
          type="add_objects::AddObjectsDisplay"
-         base_class_type="rviz_common::Display">
+         base_class_type="rviz_common::RosTopicDisplay">
     <description>Add Objects Display</description>
   </class>
   
