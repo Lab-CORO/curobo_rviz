@@ -30,7 +30,7 @@ namespace add_objects_display
         {"--ros-args", "--remap", "__node:=rviz_add_objects_display_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
-        add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::processMessage, this, _1));
+        add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::processMessage, this, std::placeholders::_1));
         
         shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
         
@@ -63,7 +63,7 @@ namespace add_objects_display
         scene_node_->setPosition(position);
         scene_node_->setOrientation(orientation);
 
-        shape_->setOrientation(Ogre::Vector3(
+        shape_->setOrientation(Ogre::Quaternion(
                                 request->pose.orientation.x,
                                 request->pose.orientation.y,
                                 request->pose.orientation.z,
