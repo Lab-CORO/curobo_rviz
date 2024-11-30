@@ -71,13 +71,23 @@ set(${PROJECT_NAME}_UIS
 qt5_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 
-add_library(curobo_rviz add_objects_display add_objects_panel SHARED
+add_library(curobo_rviz SHARED
   ${${PROJECT_NAME}_SRCS}
   ${${PROJECT_NAME}_UIS_H}
   ${${PROJECT_NAME}_MOCS} 
 )
-ament_target_dependencies(curobo_rviz add_objects_display add_objects_panel ${dependencies_pkgs})
-target_link_libraries(curobo_rviz add_objects_display add_objects_panel Qt5::Widgets rviz_common::rviz_common)
+add_library(add_objects_display SHARED
+  ${${PROJECT_NAME}_SRCS}
+  ${${PROJECT_NAME}_UIS_H}
+  ${${PROJECT_NAME}_MOCS} 
+)
+add_library(add_objects_panel SHARED
+  ${${PROJECT_NAME}_SRCS}
+  ${${PROJECT_NAME}_UIS_H}
+  ${${PROJECT_NAME}_MOCS} 
+)
+ament_target_dependencies(curobo_rviz ${dependencies_pkgs})
+target_link_libraries(curobo_rviz Qt5::Widgets rviz_common::rviz_common)
 
 # I prefer the Qt signals and slots to avoid defining "emit", "slots",
 # etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here
