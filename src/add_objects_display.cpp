@@ -30,7 +30,7 @@ namespace add_objects
         updateStyle();
     }
 
-    void AddObjectsDisplay::processMessage(const curobo_msgs::srv::AddObject_Request request)
+    void AddObjectsDisplay::processMessage(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
         
@@ -51,4 +51,4 @@ namespace add_objects
 } // add_objects
 
 #include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(add_objects::AddObjectsDisplay, rviz_common::RosTopicDisplay)
+PLUGINLIB_EXPORT_CLASS(add_objects::AddObjectsDisplay, rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>)

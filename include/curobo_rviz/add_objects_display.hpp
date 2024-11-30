@@ -9,7 +9,7 @@
 
 namespace add_objects
 {
-    class AddObjectsDisplay : public rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject>
+    class AddObjectsDisplay : public rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>
     {
         Q_OBJECT
     public:
@@ -20,7 +20,7 @@ namespace add_objects
         void onEnable() override;
         void onDisable() override;
         void update(float wall_dt, float ros_dt) override;
-        void processMessage(const curobo_msgs::srv::AddObject_Request request) override;
+        void processMessage(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request) override;
         void updateStyle();
 
         std::unique_ptr<rviz_rendering::Shape> shape_;

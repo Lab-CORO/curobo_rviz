@@ -14,7 +14,7 @@
 
   <class name="add_objects/AddObjectsDisplay"
          type="add_objects::AddObjectsDisplay"
-         base_class_type="rviz_common::RosTopicDisplay">
+         base_class_type="rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>">
     <description>Add Objects Display</description>
   </class>
   
