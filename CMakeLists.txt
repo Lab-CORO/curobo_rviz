@@ -65,7 +65,7 @@ set(${PROJECT_NAME}_HDRS
 # Define ui file
 set(${PROJECT_NAME}_UIS
   resource/curobo_rviz_panel.ui
-  resource/add_objects_panel.ui
+  resource/add_object_panel.ui
 )
 
 # Generate header for ui
