@@ -8,6 +8,7 @@ namespace add_objects
         , ui_{std::make_unique<Ui::gui>()}
         , node_{nullptr}
         , add_objects_client_ {nullptr}
+        , add_objects_publisher_ {nullptr}
     {
         auto options = rclcpp::NodeOptions().arguments(
         {"--ros-args", "--remap", "__node:=rviz_add_objects_node", "--"});
@@ -15,6 +16,9 @@ namespace add_objects
 
         // create Add_objects service
         add_objects_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/curobo_gen_traj/add_object");
+
+        // create publisher so Display can retrieve the parameters to add objects
+        add_objects_publisher_ = node_->create_publisher<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10);
 
         ui_->comboBoxObjects->addItem("Cube", QVariant(curobo_msgs::srv::AddObject_Request::CUBOID));
         ui_->comboBoxObjects->addItem("Sphere", QVariant(curobo_msgs::srv::AddObject_Request::SPHERE));
@@ -45,16 +49,13 @@ namespace add_objects
         double colorG = ui_->doubleSpinBoxColorG->value();
         double colorB = ui_->doubleSpinBoxColorB->value();
         double colorA = ui_->doubleSpinBoxColorA->value();
-        int type;
-        string name;
-
-        // retrieve type # from type string
-        type = ui_->comboBoxObjects->currentData().toInt();
+        int type = ui_->comboBoxObjects->currentData().toInt();     // retrieve type # from type string
 
         // name the object
 
         // call Add Objects with parameters
-        // add_objects_request_ = std::make_shared<>();
+        auto add_objects_request_ = curobo_msgs::srv::AddObject_Request();
+        add_objects_request_.type = type;
 
         // call Display service to add the object on the screen
 
