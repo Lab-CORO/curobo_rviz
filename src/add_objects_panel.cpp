@@ -1,7 +1,7 @@
 #include <curobo_rviz/add_objects_panel.hpp>
 #include <string>
 
-namespace add_objects
+namespace add_objects_panel
 {
     AddObjectsPanel::AddObjectsPanel(QWidget *parent)
         : Panel{parent}
@@ -101,4 +101,4 @@ namespace add_objects
         
 
     }
-} // add_objects
+} // add_objects_panel

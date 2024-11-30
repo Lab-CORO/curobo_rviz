@@ -4,7 +4,7 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 
-namespace add_objects
+namespace add_objects_display
 {
     using rviz_common::properties::StatusProperty;
     
@@ -56,7 +56,4 @@ namespace add_objects
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
         shape_->setColor(color_property_->getOgreColor());
     }
-} // add_objects
-
-#include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(add_objects::AddObjectsDisplay, rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>)
+} // add_objects_display
