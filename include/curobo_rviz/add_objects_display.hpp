@@ -20,7 +20,7 @@ namespace add_objects
         void onEnable() override;
         void onDisable() override;
         void update(float wall_dt, float ros_dt) override;
-        void processMessage(const curobo_msgs::srv::AddObject::Response::SharedPtr msg) override;
+        void processMessage(const curobo_msgs::srv::AddObject_Request request) override;
         void updateStyle();
 
         std::unique_ptr<rviz_rendering::Shape> shape_;

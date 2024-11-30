@@ -30,7 +30,7 @@ namespace add_objects
         updateStyle();
     }
 
-    void AddObjectsDisplay::processMessage(const curobo_msgs::srv::AddObject::Response::SharedPtr msg)
+    void AddObjectsDisplay::processMessage(const curobo_msgs::srv::AddObject_Request request)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
         
