@@ -16,11 +16,11 @@ namespace add_objects
         // create Add_objects service
         add_objects_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/curobo_gen_traj/add_object");
 
-        ui_->comboBoxObjects->addItem("Cube", QVariant(curobo_msgs::srv::AddObject::CUBOID));
-        ui_->comboBoxObjects->addItem("Sphere", QVariant(curobo_msgs::srv::AddObject::SPHERE));
-        ui_->comboBoxObjects->addItem("Capsule", QVariant(curobo_msgs::srv::AddObject::CAPSULE));
-        ui_->comboBoxObjects->addItem("Cylindre", QVariant(curobo_msgs::srv::AddObject::CYLINDER));
-        ui_->comboBoxObjects->addItem("Mesh", QVariant(curobo_msgs::srv::AddObject::MESH)); // Par défaut si MESH non défini
+        ui_->comboBoxObjects->addItem("Cube", QVariant(curobo_msgs::srv::AddObject_Request::CUBOID));
+        ui_->comboBoxObjects->addItem("Sphere", QVariant(curobo_msgs::srv::AddObject_Request::SPHERE));
+        ui_->comboBoxObjects->addItem("Capsule", QVariant(curobo_msgs::srv::AddObject_Request::CAPSULE));
+        ui_->comboBoxObjects->addItem("Cylindre", QVariant(curobo_msgs::srv::AddObject_Request::CYLINDER));
+        ui_->comboBoxObjects->addItem("Mesh", QVariant(curobo_msgs::srv::AddObject_Request::MESH)); // Par défaut si MESH non défini
 
     }
 
