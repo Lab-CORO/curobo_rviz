@@ -43,22 +43,22 @@ namespace add_objects
 
 
         // retrieve type # from type string
-        QString textType = ui_->comboBoxObjects->currentData();
+        QString textType = ui_->comboBoxObjects->currentData().toString();
         switch (textType) {
             case 'Cube':
-                type = add_objects_client_->CUBOID;
+                type = curobo_msgs::srv::AddObject::CUBOID;
                 break;
             case 'Sphere':
-                type = add_objects_client_->SPHERE;
+                type = curobo_msgs::srv::AddObject::SPHERE;
                 break;
             case 'Capsule':
-                type = add_objects_client_->CAPSULE;
+                type = curobo_msgs::srv::AddObject::CAPSULE;
                 break;
             case 'Cylindre':
-                type = add_objects_client_->CYLINDER;
+                type = curobo_msgs::srv::AddObject::CYLINDER;
                 break;
             case 'Mesh':
-                type = add_objects_client_->MESH;
+                type = curobo_msgs::srv::AddObject::MESH;
                 break;
             default:
                 RCLCPP_WARN(node_->get_logger(), "Couldn't find the type.");
