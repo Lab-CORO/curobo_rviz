@@ -128,31 +128,6 @@
      <height>25</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>Cube</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Sphere</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Capsule</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Cylindre</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Mesh</string>
-    </property>
-   </item>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionY">
    <property name="geometry">

@@ -15,6 +15,13 @@ namespace add_objects
 
         // create Add_objects service
         add_objects_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/curobo_gen_traj/add_object");
+
+        ui_->comboBoxObjects->addItem("Cube", QVariant(curobo_msgs::srv::AddObject::CUBOID));
+        ui_->comboBoxObjects->addItem("Sphere", QVariant(curobo_msgs::srv::AddObject::SPHERE));
+        ui_->comboBoxObjects->addItem("Capsule", QVariant(curobo_msgs::srv::AddObject::CAPSULE));
+        ui_->comboBoxObjects->addItem("Cylindre", QVariant(curobo_msgs::srv::AddObject::CYLINDER));
+        ui_->comboBoxObjects->addItem("Mesh", QVariant(curobo_msgs::srv::AddObject::MESH)); // Par défaut si MESH non défini
+
     }
 
     AddObjectsPanel::~AddObjectsPanel()
@@ -41,29 +48,8 @@ namespace add_objects
         int type;
         string name;
 
-
         // retrieve type # from type string
-        QString textType = ui_->comboBoxObjects->currentData().toString();
-        switch (textType) {
-            case 'Cube':
-                type = curobo_msgs::srv::AddObject::CUBOID;
-                break;
-            case 'Sphere':
-                type = curobo_msgs::srv::AddObject::SPHERE;
-                break;
-            case 'Capsule':
-                type = curobo_msgs::srv::AddObject::CAPSULE;
-                break;
-            case 'Cylindre':
-                type = curobo_msgs::srv::AddObject::CYLINDER;
-                break;
-            case 'Mesh':
-                type = curobo_msgs::srv::AddObject::MESH;
-                break;
-            default:
-                RCLCPP_WARN(node_->get_logger(), "Couldn't find the type.");
-                break;
-        }
+        type = ui_->comboBoxObjects->currentData().toInt();
 
         // name the object
 
