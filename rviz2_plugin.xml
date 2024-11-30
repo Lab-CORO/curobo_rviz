@@ -5,13 +5,17 @@
          base_class_type="rviz_common::Panel">
     <description>Curobo Rviz Panel</description>
   </class>
+</library>
 
+<library path="add_objects_panel">
   <class name="add_objects/AddObjectsPanel"
           type="add_objects::AddObjectsPanel"
           base_class_type="rviz_common::Panel">
       <description>Add Objects Panel</description>
   </class>
+</library>
 
+<library path="add_objects_display">
   <class name="add_objects/AddObjectsDisplay"
          type="add_objects::AddObjectsDisplay"
          base_class_type="rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>">
