@@ -27,13 +27,13 @@ namespace add_objects
         double posX = ui_->doubleSpinBoxPositionX->value();
         double posY = ui_->doubleSpinBoxPositionY->value();
         double posZ = ui_->doubleSpinBoxPositionZ->value();
-        double orientationX = ui_->doubleSpinBoxxOrientationX->value();
+        double orientationX = ui_->doubleSpinBoxOrientationX->value();
         double orientationY = ui_->doubleSpinBoxOrientationY->value();
         double orientationZ = ui_->doubleSpinBoxOrientationZ->value();
         double orientationW = ui_->doubleSpinBoxOrientationW->value();
-        double dimX = ui_->doubleSpinBoxDimensionsX->value();
-        double dimY = ui_->doubleSpinBoxDimensionsY->value();
-        double dimZ = ui_->doubleSpinBoxDimensionsZ->value();
+        double dimX = ui_->doubleSpinBoxDimensionX->value();
+        double dimY = ui_->doubleSpinBoxDimensionY->value();
+        double dimZ = ui_->doubleSpinBoxDimensionZ->value();
         double colorR = ui_->doubleSpinBoxColorA->value();
         double colorG = ui_->doubleSpinBoxColorG->value();
         double colorB = ui_->doubleSpinBoxColorB->value();
