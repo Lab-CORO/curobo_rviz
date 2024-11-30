@@ -72,47 +72,30 @@ set(${PROJECT_NAME}_UIS
 qt5_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 
-add_library(curobo_rviz SHARED
-            src/curobo_rviz.cpp
-            src/add_objects_display.cpp
-            src/add_objects_panel.cpp)
-target_include_directories(curobo_rviz PRIVATE include)
-ament_target_dependencies(curobo_rviz ${dependencies_pkgs})
-target_compile_definitions(curobo_rviz PRIVATE QT_NO_KEYWORDS)
-
-#add_library(${library_name} SHARED
-#  ${${PROJECT_NAME}_SRCS}
-#  ${${PROJECT_NAME}_UIS_H}
-#  ${${PROJECT_NAME}_MOCS} 
-#)
-#target_link_libraries(${library_name} Qt5::Widgets rviz_common::rviz_common)
-#ament_target_dependencies(${library_name} ${dependencies_pkgs})
+add_library(${library_name} SHARED
+  ${${PROJECT_NAME}_SRCS}
+  ${${PROJECT_NAME}_UIS_H}
+  ${${PROJECT_NAME}_MOCS} 
+)
+target_link_libraries(${library_name} Qt5::Widgets rviz_common::rviz_common)
+ament_target_dependencies(${library_name} ${dependencies_pkgs})
 
 # I prefer the Qt signals and slots to avoid defining "emit", "slots",
 # etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here
 # e.g. http://muddyazian.blogspot.de/2012/04/getting-qt-app-working-with-boost-using.html
-#target_compile_definitions(${library_name} PRIVATE QT_NO_KEYWORDS)
+target_compile_definitions(${library_name} PRIVATE QT_NO_KEYWORDS)
 
 # install
 pluginlib_export_plugin_description_file(rviz_common rviz2_plugin.xml)
 
 install(
-  TARGETS curobo_rviz
-  EXPORT curobo_rviz
+  TARGETS ${library_name}
+  EXPORT ${library_name}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
-
-#install(
-#  TARGETS ${library_name}
-#  EXPORT ${library_name}
-#  ARCHIVE DESTINATION lib
-#  LIBRARY DESTINATION lib
-#  RUNTIME DESTINATION bin
-#  INCLUDES DESTINATION include
-#)
 
 install(
   DIRECTORY include/
@@ -131,8 +114,7 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_include_directories(include)
-ament_export_targets(curobo_rviz HAS_LIBRARY_TARGET)
-#ament_export_targets(${library_name} HAS_LIBRARY_TARGET)
+ament_export_targets(${library_name} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${dependencies_pkgs})
 
 ament_package()
