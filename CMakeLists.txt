@@ -75,19 +75,19 @@ qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 add_library(curobo_rviz SHARED
             src/curobo_rviz.cpp)
 target_include_directories(curobo_rviz PRIVATE include)
-ament_target_dependencies(curobo_rviz Qt5::Widgets rviz_common::rviz_common)
+ament_target_dependencies(curobo_rviz rviz_common::rviz_common)
 target_compile_definitions(curobo_rviz PRIVATE QT_NO_KEYWORDS)
 
 add_library(add_objects_display SHARED
             src/add_objects_display.cpp)
 target_include_directories(add_objects_display PRIVATE include)
-ament_target_dependencies(add_objects_display Qt5::Widgets rviz_common::rviz_common)
+ament_target_dependencies(add_objects_display rviz_common::rviz_common)
 target_compile_definitions(add_objects_display PRIVATE QT_NO_KEYWORDS)
 
 add_library(add_objects_panel SHARED
             src/add_objects_panel.cpp)
 target_include_directories(add_objects_panel PRIVATE include)
-ament_target_dependencies(add_objects_panel Qt5::Widgets rviz_common::rviz_common)
+ament_target_dependencies(add_objects_panel rviz_common::rviz_common)
 target_compile_definitions(add_objects_panel PRIVATE QT_NO_KEYWORDS)
 
 #add_library(${library_name} SHARED
