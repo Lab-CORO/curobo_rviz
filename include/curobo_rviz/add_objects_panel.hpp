@@ -7,7 +7,7 @@
 
 # include <ui_add_object_panel.h>
 
-namespace add_objects
+namespace add_objects_panel
 {
     class AddObjectsPanel : public rviz_common::Panel
     {
@@ -29,4 +29,4 @@ namespace add_objects
 }
 
 #include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(add_objects::AddObjectsPanel, rviz_common::Panel)
+PLUGINLIB_EXPORT_CLASS(add_objects_panel::AddObjectsPanel, rviz_common::Panel)

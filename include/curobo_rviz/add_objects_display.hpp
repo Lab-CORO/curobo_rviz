@@ -7,7 +7,7 @@
 #include <curobo_msgs/srv/add_object.hpp>
 #include <QtWidgets>
 
-namespace add_objects
+namespace add_objects_display
 {
     class AddObjectsDisplay : public rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>
     {
@@ -28,4 +28,4 @@ namespace add_objects
 }
 
 #include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(add_objects::AddObjectsDisplay, rviz_common::Display)
+PLUGINLIB_EXPORT_CLASS(add_objects_display::AddObjectsDisplay, rviz_common::Display)
