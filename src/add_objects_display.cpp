@@ -32,10 +32,12 @@ namespace add_objects_display
     }
 
     void AddObjectsDisplay::onEnable(){
+        RosTopicDisplay::onEnable();
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::onEnable()");
     }
 
     void AddObjectsDisplay::onDisable(){
+        RosTopicDisplay::onDisable();
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::onDisable()");
     }
 
