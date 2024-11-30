@@ -30,6 +30,14 @@ namespace add_objects
         updateStyle();
     }
 
+    void AddObjectsDisplay::onEnable(){
+        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::onEnable()");
+    }
+
+    void AddObjectsDisplay::onDisable(){
+        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::onDisable()");
+    }
+
     void AddObjectsDisplay::processMessage(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");

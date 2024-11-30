@@ -19,7 +19,6 @@ namespace add_objects
         void onInitialize() override;
         void onEnable() override;
         void onDisable() override;
-        void update(float wall_dt, float ros_dt) override;
         void processMessage(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request) override;
         void updateStyle();
 
