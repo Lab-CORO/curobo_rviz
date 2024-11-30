@@ -1,21 +1,27 @@
-<library path="curobo_rviz">
+<class_libraries> 
+  <library path="curobo_rviz">
 
-  <class name="curobo_rviz/RvizArgsPanel"
-         type="curobo_rviz::RvizArgsPanel"
-         base_class_type="rviz_common::Panel">
-    <description>Curobo Rviz Panel</description>
-  </class>
-
-  <class name="add_objects_panel/AddObjectsPanel"
-          type="add_objects_panel::AddObjectsPanel"
+    <class name="curobo_rviz/RvizArgsPanel"
+          type="curobo_rviz::RvizArgsPanel"
           base_class_type="rviz_common::Panel">
-      <description>Add Objects Panel</description>
-  </class>
+      <description>Curobo Rviz Panel</description>
+    </class>
+  </library>
 
-  <class name="add_objects_display/AddObjectsDisplay"
-         type="add_objects_display::AddObjectsDisplay"
-         base_class_type="rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>">
-    <description>Add Objects Display</description>
-  </class>
-  
-</library>
+  <library path="add_objects_panel">
+    <class name="add_objects_panel/AddObjectsPanel"
+            type="add_objects_panel::AddObjectsPanel"
+            base_class_type="rviz_common::Panel">
+        <description>Add Objects Panel</description>
+    </class>
+  </library>
+
+  <library path="add_objects_display">
+    <class name="add_objects_display/AddObjectsDisplay"
+          type="add_objects_display::AddObjectsDisplay"
+          base_class_type="rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>">
+      <description>Add Objects Display</description>
+    </class>
+    
+  </library>
+</class_libraries> 
