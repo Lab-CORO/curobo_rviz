@@ -39,8 +39,8 @@ namespace add_objects
             return;
         }
         
-        shape_->setScale(Ogre::Vector3(msg->dimensions.x, msg->dimensions.y, msg->dimensions.z));
-        shape_->setPosition(Ogre::Vector3(msg->pose.position.x, msg->pose.position.y, msg->pose.position.z));
+        // shape_->setScale(Ogre::Vector3(msg->dimensions.x, msg->dimensions.y, msg->dimensions.z));
+        // shape_->setPosition(Ogre::Vector3(msg->pose.position.x, msg->pose.position.y, msg->pose.position.z));
     }
 
     void AddObjectsDisplay::updateStyle()
@@ -51,4 +51,4 @@ namespace add_objects
 } // add_objects
 
 #include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(add_objects::AddObjectsDisplay, rviz_common::Display)
+PLUGINLIB_EXPORT_CLASS(add_objects::AddObjectsDisplay, rviz_common::RosTopicDisplay)

@@ -16,9 +16,14 @@ namespace add_objects
         explicit AddObjectsPanel(QWidget *parent = nullptr);
         ~AddObjectsPanel();
 
+    private Q_SLOTS:
+        void on_pushButtonAdd_clicked();
+        void on_pushButtonRemove_clicked();
+
     private:
         std::unique_ptr<Ui::gui> ui_;
         rclcpp::Node::SharedPtr node_;
+        rclcpp::Client<curobo_msgs::srv::AddObject>::SharedPtr add_objects_client_
     };
 }
 

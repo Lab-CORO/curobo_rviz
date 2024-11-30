@@ -1,7 +1,7 @@
 #pragma once
 
 #include <rclcpp/rclcpp.hpp>
-#include <rviz_common/display.hpp>
+#include <rviz_common/ros_topic_display.hpp>
 #include <rviz_common/properties/color_property.hpp>
 #include <rviz_rendering/objects/shape.hpp>
 #include <curobo_msgs/srv/add_object.hpp>
@@ -9,7 +9,7 @@
 
 namespace add_objects
 {
-    class AddObjectsDisplay : public rviz_common::Display
+    class AddObjectsDisplay : public rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject>
     {
         Q_OBJECT
     public:
@@ -20,7 +20,7 @@ namespace add_objects
         void onEnable() override;
         void onDisable() override;
         void update(float wall_dt, float ros_dt) override;
-        void processMessage(const curobo_msgs::srv::AddObject::Response::SharedPtr msg);
+        void processMessage(const curobo_msgs::srv::AddObject::Response::SharedPtr msg) override;
         void updateStyle();
 
         std::unique_ptr<rviz_rendering::Shape> shape_;

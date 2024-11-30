@@ -7,13 +7,14 @@ namespace add_objects
         : Panel{parent}
         , ui_{std::make_unique<Ui::gui>()}
         , node_{nullptr}
+        , add_objects_client_ {nullptr}
     {
         auto options = rclcpp::NodeOptions().arguments(
         {"--ros-args", "--remap", "__node:=rviz_add_objects_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
         // create Add_objects service
-        add_objects_client_ = node_->create_client<curobo_msgs::srv::Add_objects>("/curobo_gen_traj/add_object");
+        add_objects_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/curobo_gen_traj/add_object");
     }
 
     AddObjectsPanel::~AddObjectsPanel()
