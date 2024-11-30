@@ -69,8 +69,8 @@ set(${PROJECT_NAME}_UIS
 )
 
 # Generate header for ui
-qt5_wrap_ui(${${PROJECT_NAME}_UIS_H} ${${PROJECT_NAME}_UIS})
-qt5_wrap_cpp(${${PROJECT_NAME}_MOCS} ${${PROJECT_NAME}_HDRS})
+qt5_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
+qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 
 add_library(${library_name} SHARED
   ${${PROJECT_NAME}_SRCS}
