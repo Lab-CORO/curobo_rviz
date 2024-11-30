@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef ADD_OBJECTS_DISPLAY__ADD_OBJECTS_DISPLAY_HPP_
+#define ADD_OBJECTS_DISPLAY__ADD_OBJECTS_DISPLAY_HPP_
+
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/ros_topic_display.hpp>
 #include <rviz_common/properties/color_property.hpp>
@@ -24,5 +27,10 @@ namespace add_objects_display
 
         std::unique_ptr<rviz_rendering::Shape> shape_;
         std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
+    
+    private:
+        rclcpp::Node::SharedPtr node_;
     };
-}
+} // namespace add_objects_display
+
+#endif  // ADD_OBJECTS_DISPLAY__ADD_OBJECTS_DISPLAY_HPP_
