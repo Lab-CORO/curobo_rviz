@@ -1,4 +1,4 @@
-Cmake_minimum_required(VERSION 3.8)
+resource/add_panelCmake_minimum_required(VERSION 3.8)
 project(curobo_rviz)
 
 # Default to C99
@@ -65,13 +65,16 @@ set(${PROJECT_NAME}_HDRS
 # Define ui file
 set(${PROJECT_NAME}_UIS
   resource/curobo_rviz_panel.ui
+  resource/add_objects_panel.ui
 )
 
 # Generate header for ui
 qt5_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 qt5_wrap_cpp(MOC_FILES
-  include/add_object/add_object.hpp
+  include/add_objects_display.hpp
+  include/add_objects_panel.hpp
+
 )
 
 add_library(${library_name} SHARED
