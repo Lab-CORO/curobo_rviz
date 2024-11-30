@@ -46,22 +46,22 @@ namespace add_objects
         QString textType = ui_->comboBoxObjects->currentData();
         switch (textType) {
             case 'Cube':
-                type = add_objects_client_.CUBOID;
+                type = add_objects_client_->CUBOID;
                 break;
             case 'Sphere':
-                type = add_objects_client_.SPHERE;
+                type = add_objects_client_->SPHERE;
                 break;
             case 'Capsule':
-                type = add_objects_client_.CAPSULE;
+                type = add_objects_client_->CAPSULE;
                 break;
             case 'Cylindre':
-                type = add_objects_client_.CYLINDER;
+                type = add_objects_client_->CYLINDER;
                 break;
             case 'Mesh':
-                type = add_objects_client_.MESH;
+                type = add_objects_client_->MESH;
                 break;
             default:
-                RCLCPP_WARNING(node_->get_logger(), "Couldn't find the type.");
+                RCLCPP_WARN(node_->get_logger(), "Couldn't find the type.");
                 break;
         }
 
