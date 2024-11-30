@@ -25,6 +25,7 @@ set(CMAKE_AUTOMOC ON)
 find_package(ament_cmake REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rviz_common REQUIRED)
+find_package(curobo_msgs REQUIRED)
 
 set(dependencies_pkgs
   rclcpp
