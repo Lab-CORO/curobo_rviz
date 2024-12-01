@@ -39,13 +39,7 @@ namespace add_objects_display
         color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(204, 51, 204), "Color to draw the object.", this, SLOT(updateStyle()));
         updateStyle();
         
-        if (shape_) {
-            auto parent_node = shape_->getRootNode();
-            if (parent_node) {
-                parent_node->detachObject(shape_->getEntity());
-                shape_reset();
-            }
-        }
+        shape_.reset();
     }
 
     void AddObjectsDisplay::onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
