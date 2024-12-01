@@ -8,6 +8,7 @@
 #include <rviz_common/properties/color_property.hpp>
 #include <rviz_rendering/objects/shape.hpp>
 #include <curobo_msgs/srv/add_object.hpp>
+#include <curobo_msgs/srv/remove_object.hpp>
 #include <QtWidgets>
 
 namespace add_objects_display
@@ -24,7 +25,8 @@ namespace add_objects_display
 
     protected:
         void onInitialize() override;
-        void onUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request);
+        void onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request);
+        void onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request);
 
         std::unique_ptr<rviz_rendering::Shape> shape_;
         std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
@@ -32,6 +34,7 @@ namespace add_objects_display
     private:
         rclcpp::Node::SharedPtr node_;
         rclcpp::Subscription<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_subscriber_;
+        rclcpp::Subscription<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_subscriber_;
     };
 } // namespace add_objects_display
 

@@ -14,6 +14,7 @@ namespace add_objects_display
         , color_property_{nullptr}
         , node_{nullptr}
         , add_object_subscriber_{nullptr}
+        , remove_object_subscriber_{nullptr}
     {
     }
 
@@ -30,7 +31,8 @@ namespace add_objects_display
         {"--ros-args", "--remap", "__node:=rviz_add_objects_display_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
-        add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::onUpdate, this, std::placeholders::_1));
+        add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::onAddUpdate, this, std::placeholders::_1));
+        remove_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10, std::bind(&AddObjectsDisplay::onRemoveUpdate, this, std::placeholders::_1));
         
         shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
         
@@ -38,7 +40,7 @@ namespace add_objects_display
         updateStyle();
     }
 
-    void AddObjectsDisplay::onUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
+    void AddObjectsDisplay::onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
         
@@ -67,6 +69,12 @@ namespace add_objects_display
                                 request->pose.position.y,
                                 request->pose.position.z));
         color_property_->setColor(QColor(request->color.r, request->color.g, request->color.b));
+        updateStyle();
+    }
+
+    void AddObjectsDisplay::onAddUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
+    {
+
     }
 
     void AddObjectsDisplay::updateStyle()
