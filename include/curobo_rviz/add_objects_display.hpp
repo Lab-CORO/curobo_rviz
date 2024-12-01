@@ -18,10 +18,13 @@ namespace add_objects_display
     public:
         explicit AddObjectsDisplay();
         ~AddObjectsDisplay();
+
+    private Q_SLOTS:
+        void updateStyle();
+
     protected:
         void onInitialize() override;
         void onUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request);
-        void updateStyle();
 
         std::unique_ptr<rviz_rendering::Shape> shape_;
         std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
