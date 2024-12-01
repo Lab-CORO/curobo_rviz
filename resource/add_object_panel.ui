@@ -6,264 +6,162 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>395</height>
+    <width>383</width>
+    <height>388</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QListWidget" name="listWidgetObjects">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>241</y>
-     <width>431</width>
-     <height>141</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionX">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>50</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionY">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>50</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionZ">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>50</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationX">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>90</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationY">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>90</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationZ">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>90</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationW">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>90</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButtonAdd">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>210</y>
-     <width>89</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>+  Add</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButtonRemove">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>210</y>
-     <width>89</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>-  Remove</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="comboBoxObjects">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>10</y>
-     <width>151</width>
-     <height>25</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionY">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>130</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionZ">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>130</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionX">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>130</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxColorR">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>170</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxColorG">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>170</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxColorB">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>170</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBoxColorA">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>170</y>
-     <width>65</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="labelType">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>67</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Type</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="labelPosition">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>50</y>
-     <width>67</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Position</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="labelOrientation">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>90</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Orientation</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="labelDimensions">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>130</y>
-     <width>81</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Dimensions</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="labelColor">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>170</y>
-     <width>67</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Color</string>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelName">
+     <property name="text">
+      <string>Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="5">
+    <widget class="QLineEdit" name="lineEditName">
+     <property name="text">
+      <string>Object Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelType">
+     <property name="text">
+      <string>Type</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4" colspan="2">
+    <widget class="QLineEdit" name="lineEditMeshPath">
+     <property name="text">
+      <string>Mesh Path</string>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelPosition">
+     <property name="text">
+      <string>Position</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionX"/>
+   </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionY"/>
+   </item>
+   <item row="2" column="4">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionZ"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelOrientation">
+     <property name="text">
+      <string>Orientation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationX"/>
+   </item>
+   <item row="3" column="2" colspan="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationY"/>
+   </item>
+   <item row="3" column="4">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationZ"/>
+   </item>
+   <item row="3" column="5">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationW"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelDimensions">
+     <property name="text">
+      <string>Dimensions</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionX"/>
+   </item>
+   <item row="4" column="2" colspan="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionY"/>
+   </item>
+   <item row="4" column="4">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionZ"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="labelColor">
+     <property name="text">
+      <string>Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxColorR"/>
+   </item>
+   <item row="5" column="2" colspan="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxColorG"/>
+   </item>
+   <item row="5" column="4">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxColorB"/>
+   </item>
+   <item row="5" column="5">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxColorA"/>
+   </item>
+   <item row="7" column="0" colspan="6">
+    <widget class="QListWidget" name="listWidgetObjects"/>
+   </item>
+   <item row="6" column="4" colspan="2">
+    <widget class="QPushButton" name="pushButtonRemove">
+     <property name="text">
+      <string>-  Remove</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="3">
+    <widget class="QComboBox" name="comboBoxObjects">
+     <item>
+      <property name="text">
+       <string>Cube</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sphere</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Capsule</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Cylinder</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Mesh</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="3">
+    <widget class="QPushButton" name="pushButtonAdd">
+     <property name="text">
+      <string>+  Add</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
