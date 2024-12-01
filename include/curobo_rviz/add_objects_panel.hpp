@@ -3,6 +3,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/panel.hpp>
 #include <curobo_msgs/srv/add_object.hpp>
+#include <curobo_msgs/srv/remove_object.hpp>
 #include <QtWidgets>
 
 # include <ui_add_object_panel.h>
@@ -25,5 +26,6 @@ namespace add_objects_panel
         rclcpp::Node::SharedPtr node_;
         rclcpp::Client<curobo_msgs::srv::AddObject>::SharedPtr add_object_client_;
         rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_publisher_;
+        rclcpp::Publisher<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_publisher_;
     };
 }

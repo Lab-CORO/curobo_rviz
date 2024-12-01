@@ -19,6 +19,7 @@ namespace add_objects_panel
 
         // create publisher so Display can retrieve the parameters to add objects
         add_object_publisher_ = node_->create_publisher<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10);
+        remove_object_publisher_ = node_->create_publisher<curobo_msgs::srv::RemoveObject_Request>("add_objects_topic", 10);
 
         ui_->comboBoxObjects->addItem("Cube", QVariant(curobo_msgs::srv::AddObject_Request::CUBOID));
         ui_->comboBoxObjects->addItem("Sphere", QVariant(curobo_msgs::srv::AddObject_Request::SPHERE));
