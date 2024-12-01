@@ -38,6 +38,7 @@ namespace add_objects_display
         
         color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(204, 51, 204), "Color to draw the object.", this, SLOT(updateStyle()));
         updateStyle();
+        scene_manager_.remove_object(shape_); // testing how to remove the shape
     }
 
     void AddObjectsDisplay::onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
