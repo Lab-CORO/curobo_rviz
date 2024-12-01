@@ -30,7 +30,7 @@ namespace add_objects_display
         {"--ros-args", "--remap", "__node:=rviz_add_objects_display_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
-        add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::processMessage, this, std::placeholders::_1));
+        add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::onUpdate, this, std::placeholders::_1));
         
         shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
         
@@ -38,17 +38,7 @@ namespace add_objects_display
         updateStyle();
     }
 
-    void AddObjectsDisplay::onEnable(){
-        RosTopicDisplay::onEnable();
-        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::onEnable()");
-    }
-
-    void AddObjectsDisplay::onDisable(){
-        RosTopicDisplay::onDisable();
-        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::onDisable()");
-    }
-
-    void AddObjectsDisplay::processMessage(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
+    void AddObjectsDisplay::onUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
         

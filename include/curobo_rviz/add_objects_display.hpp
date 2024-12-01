@@ -20,9 +20,7 @@ namespace add_objects_display
         ~AddObjectsDisplay();
     protected:
         void onInitialize() override;
-        void onEnable() override;
-        void onDisable() override;
-        void processMessage(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request) override;
+        void onUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request);
         void updateStyle();
 
         std::unique_ptr<rviz_rendering::Shape> shape_;
