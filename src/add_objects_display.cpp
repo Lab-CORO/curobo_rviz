@@ -73,7 +73,7 @@ namespace add_objects_display
         updateStyle();
     }
 
-    void AddObjectsDisplay::onAddUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
+    void AddObjectsDisplay::onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
     {
 
     }
