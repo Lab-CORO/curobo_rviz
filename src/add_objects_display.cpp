@@ -76,7 +76,7 @@ namespace add_objects_display
 
     void AddObjectsDisplay::onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
     {
-
+        shape_.reset();
     }
 
     void AddObjectsDisplay::updateStyle()
