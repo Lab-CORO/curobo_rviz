@@ -9,7 +9,7 @@ namespace add_objects_display
     using rviz_common::properties::StatusProperty;
     
     AddObjectsDisplay::AddObjectsDisplay()
-        : RosTopicDisplay{}
+        : Display{}
         , shape_{nullptr}
         , color_property_{nullptr}
         , node_{nullptr}
@@ -87,4 +87,4 @@ namespace add_objects_display
 } // add_objects_display
 
 #include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(add_objects_display::AddObjectsDisplay, rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>)
+PLUGINLIB_EXPORT_CLASS(add_objects_display::AddObjectsDisplay, rviz_common::Display)

@@ -12,7 +12,7 @@
 
 namespace add_objects_display
 {
-    class AddObjectsDisplay : public rviz_common::RosTopicDisplay<curobo_msgs::srv::AddObject_Request>
+    class AddObjectsDisplay : public rviz_common::Display
     {
         Q_OBJECT
     public:
