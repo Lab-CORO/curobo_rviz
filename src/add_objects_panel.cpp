@@ -7,8 +7,9 @@ namespace add_objects_panel
         : Panel{parent}
         , ui_{std::make_unique<Ui::gui>()}
         , node_{nullptr}
-        , add_object_client_ {nullptr}
-        , add_object_publisher_ {nullptr}
+        , add_object_client_{nullptr}
+        , add_object_publisher_{nullptr}
+        , remove_object_publisher_{nullptr}
     {
         auto options = rclcpp::NodeOptions().arguments(
         {"--ros-args", "--remap", "__node:=rviz_add_objects_node", "--"});
