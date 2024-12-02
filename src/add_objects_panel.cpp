@@ -5,12 +5,15 @@ namespace add_objects_panel
 {
     AddObjectsPanel::AddObjectsPanel(QWidget *parent)
         : Panel{parent}
-        , ui_{std::make_unique<Ui::gui>()}
+        , ui_{std::make_unique<Ui::gui_objects>()}
         , node_{nullptr}
         , add_object_client_{nullptr}
         , add_object_publisher_{nullptr}
         , remove_object_publisher_{nullptr}
     {
+        // Extend the widget with all attributes and children from UI file
+        ui_->setupUi(this);
+        
         auto options = rclcpp::NodeOptions().arguments(
         {"--ros-args", "--remap", "__node:=rviz_add_objects_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
@@ -22,11 +25,16 @@ namespace add_objects_panel
         add_object_publisher_ = node_->create_publisher<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10);
         remove_object_publisher_ = node_->create_publisher<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10);
 
+        // associate types to the service constants
         ui_->comboBoxObjects->addItem("Cube", QVariant(curobo_msgs::srv::AddObject_Request::CUBOID));
         ui_->comboBoxObjects->addItem("Sphere", QVariant(curobo_msgs::srv::AddObject_Request::SPHERE));
         ui_->comboBoxObjects->addItem("Capsule", QVariant(curobo_msgs::srv::AddObject_Request::CAPSULE));
         ui_->comboBoxObjects->addItem("Cylindre", QVariant(curobo_msgs::srv::AddObject_Request::CYLINDER));
         ui_->comboBoxObjects->addItem("Mesh", QVariant(curobo_msgs::srv::AddObject_Request::MESH));
+
+        // put placeholders
+        ui_->lineEditName->setPlaceholderText("object_name");
+        ui_->lineEditMeshPath->setPlaceholderText("path/to/mesh");
 
         RCLCPP_INFO(node_->get_logger(), "Initialized objects panel");
     }
@@ -52,17 +60,27 @@ namespace add_objects_panel
         double colorG = ui_->doubleSpinBoxColorG->value();
         double colorB = ui_->doubleSpinBoxColorB->value();
         double colorA = ui_->doubleSpinBoxColorA->value();
-        int type = ui_->comboBoxObjects->currentData().toInt();     // retrieve type #
+        int type = ui_->comboBoxObjects->currentData().toInt();
         // TODO: Check if name is unique. else : error message
-        std::string name = "temp_name";
+        std::string name = ui_->lineEditName->displayText().toStdString();
         std::string mesh_file_path = "";
+        if (name.empty()) {
+            // TODO: modify label to show message
+            RCLCPP_WARN(node_->get_logger(), "The object must have a name. Can't make it empty");
+            return;
+        }
+        if (type == curobo_msgs::srv::AddObject_Request::MESH && mesh_file_path.empty()) {
+            // TODO: modify label to show message
+            RCLCPP_WARN(node_->get_logger(), "The mesh path must be specified. Can't make it empty");
+            return;
+        }
 
         RCLCPP_INFO(node_->get_logger(), "Sending following message to service:\n"
                                             "\ttype: %d\tname: %s\n"
                                             "\tmesh_file_path: %s\n"
                                             "\tpose: {position: %f, %f, %f}{orientation: %f, %f, %f, %f}\n"
                                             "\tdimensions: %f, %f, %f\n"
-                                            "\tcolor: %f, %f, %f, %f\n",
+                                            "\tcolor: %f, %f, %f, %f",
                                             type, name.c_str(),
                                             mesh_file_path.c_str(),
                                             posX, posY, posZ, orientationX, orientationY, orientationZ, orientationW,
@@ -95,14 +113,19 @@ namespace add_objects_panel
         // call Display service to add the object on the screen
         add_object_publisher_->publish(add_object_request_);
 
-        // add item to QListWidget (store the name to easily retrieve the name for suppression later on)
-        // TODO : show name +  pose (= position + orientation)
+        // add item to QListWidget
+        QString objectDisplayText = QString("%s {pos: %f, %f, %f}{ori: %f, %f, %f, %f}")
+                                            .arg(name.c_str()).arg(posX).arg(posY).arg(posZ)
+                                            .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW); // TODO: fix args cause the values aren't taken
+        QListWidgetItem* objectItem = new QListWidgetItem(objectDisplayText);
+        objectItem->setData(Qt::UserRole, QVariant(QString::fromStdString(name))); // store name as data for the remove service
+        ui_->listWidgetObjects->addItem(objectItem);
     }
 
     void AddObjectsPanel::on_pushButtonRemove_clicked()
     {
-        
-
+        std::string name = "temp_name";
+        RCLCPP_INFO(node_->get_logger(), "Deleting the following object: %s", name.c_str());
     }
 } // add_objects_panel
 
