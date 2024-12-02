@@ -5,7 +5,7 @@ namespace add_objects_panel
 {
     AddObjectsPanel::AddObjectsPanel(QWidget *parent)
         : Panel{parent}
-        , ui_{std::make_shared<Ui::gui>()}
+        , ui_{std::make_unique<Ui::gui>()}
         , node_{nullptr}
         , add_object_client_{nullptr}
         , add_object_publisher_{nullptr}

@@ -22,7 +22,7 @@ namespace add_objects_panel
         void on_pushButtonRemove_clicked();
 
     private:
-        std::shared_ptr<Ui::gui> ui_;
+        std::unique_ptr<Ui::gui> ui_;
         rclcpp::Node::SharedPtr node_;
         rclcpp::Client<curobo_msgs::srv::AddObject>::SharedPtr add_object_client_;
         rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_publisher_;
