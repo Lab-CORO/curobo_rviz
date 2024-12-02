@@ -6,7 +6,8 @@
 #include <curobo_msgs/srv/remove_object.hpp>
 #include <QtWidgets>
 
-# include <ui_add_object_panel.h>
+// #include <ui_add_object_panel.h>
+#include <ui_curobo_rviz_panel.h>
 
 namespace add_objects_panel
 {
