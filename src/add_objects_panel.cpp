@@ -26,7 +26,9 @@ namespace add_objects_panel
         ui_->comboBoxObjects->addItem("Sphere", QVariant(curobo_msgs::srv::AddObject_Request::SPHERE));
         ui_->comboBoxObjects->addItem("Capsule", QVariant(curobo_msgs::srv::AddObject_Request::CAPSULE));
         ui_->comboBoxObjects->addItem("Cylindre", QVariant(curobo_msgs::srv::AddObject_Request::CYLINDER));
-        ui_->comboBoxObjects->addItem("Mesh", QVariant(curobo_msgs::srv::AddObject_Request::MESH)); // Par défaut si MESH non défini
+        ui_->comboBoxObjects->addItem("Mesh", QVariant(curobo_msgs::srv::AddObject_Request::MESH));
+
+        RCLCPP_INFO(node_->get_logger(), "Initialized objects panel");
     }
 
     AddObjectsPanel::~AddObjectsPanel()
