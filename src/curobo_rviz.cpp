@@ -21,7 +21,7 @@ namespace curobo_rviz
 
     // Init rclcpp node
     auto options = rclcpp::NodeOptions().arguments(
-        {"--ros-args", "--remap", "__node:=rviz_push_button_node", "--"});
+        {"--ros-args", "--remap", "__node:=rviz_updata_parameters_node", "--"});
     node_ = std::make_shared<rclcpp::Node>("_", options);
     param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "curobo_gen_traj");
     while (!param_client_->wait_for_service(std::chrono::seconds(3))) {
