@@ -59,7 +59,7 @@ namespace add_objects_panel
         RCLCPP_INFO(node_->get_logger(), "Sending following message to service:\n"
                                             "\ttype: %d\tname: %s\n"
                                             "\tmesh_file_path: %s\n"
-                                            "\tpose: {position: %f, %f, %f}{orientation: %f, %f, %f}\n"
+                                            "\tpose: {position: %f, %f, %f}{orientation: %f, %f, %f, %f}\n"
                                             "\tdimensions: %f, %f, %f\n"
                                             "\tcolor: %f, %f, %f, %f\n",
                                             type, name.c_str(),
