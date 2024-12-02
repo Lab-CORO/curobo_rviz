@@ -4,7 +4,7 @@ namespace curobo_rviz
 {
   RvizArgsPanel::RvizArgsPanel(QWidget *parent)
     : Panel{parent}
-    , ui_(std::make_unique<Ui::gui>())
+    , ui_(std::make_shared<Ui::gui>())
     , node_{nullptr}
     , param_client_{nullptr}
     , motion_gen_config_client_{nullptr}

@@ -5,7 +5,7 @@ namespace add_objects_panel
 {
     AddObjectsPanel::AddObjectsPanel(QWidget *parent)
         : Panel{parent}
-        , ui_{std::make_unique<Ui::gui>()}
+        , ui_{std::make_shared<Ui::gui>()}
         , node_{nullptr}
         , add_object_client_{nullptr}
         , add_object_publisher_{nullptr}
@@ -27,7 +27,6 @@ namespace add_objects_panel
         ui_->comboBoxObjects->addItem("Capsule", QVariant(curobo_msgs::srv::AddObject_Request::CAPSULE));
         ui_->comboBoxObjects->addItem("Cylindre", QVariant(curobo_msgs::srv::AddObject_Request::CYLINDER));
         ui_->comboBoxObjects->addItem("Mesh", QVariant(curobo_msgs::srv::AddObject_Request::MESH)); // Par défaut si MESH non défini
-
     }
 
     AddObjectsPanel::~AddObjectsPanel()
