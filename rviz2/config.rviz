@@ -29,7 +29,7 @@ Panels:
   - Class: curobo_rviz/RvizArgsPanel
     Name: RvizArgsPanel
   - Class: add_objects_panel/AddObjectsPanel
-    Name: RvizArgsPanel
+    Name: AddObjectsPanel
 Visualization Manager:
   Class: ""
   Displays:
