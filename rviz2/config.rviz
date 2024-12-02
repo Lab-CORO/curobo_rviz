@@ -28,8 +28,6 @@ Panels:
     SyncSource: ""
   - Class: curobo_rviz/RvizArgsPanel
     Name: RvizArgsPanel
-  - Class: add_objects_panel/AddObjectsPanel
-    Name: RvizArgsPanel
 Visualization Manager:
   Class: ""
   Displays:
