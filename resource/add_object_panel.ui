@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>383</width>
-    <height>388</height>
+    <height>369</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -84,6 +84,12 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="minimum">
+    <double>-200.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>200.000000000000000</double>
+   </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionY">
    <property name="geometry">
@@ -94,6 +100,12 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="minimum">
+    <double>-200.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>200.000000000000000</double>
+   </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionZ">
    <property name="geometry">
@@ -103,6 +115,12 @@
      <width>65</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="minimum">
+    <double>-200.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>200.000000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="labelOrientation">
@@ -223,6 +241,9 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
+   </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxColorG">
    <property name="geometry">
@@ -232,6 +253,9 @@
      <width>65</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
    </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxColorB">
@@ -243,6 +267,9 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
+   </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxColorA">
    <property name="geometry">
@@ -253,14 +280,17 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
+   </property>
   </widget>
   <widget class="QListWidget" name="listWidgetObjects">
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>230</y>
+     <y>260</y>
      <width>365</width>
-     <height>149</height>
+     <height>101</height>
     </rect>
    </property>
   </widget>
@@ -298,6 +328,19 @@
    </property>
    <property name="text">
     <string>+  Add</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelMessage">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>230</y>
+     <width>361</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>
