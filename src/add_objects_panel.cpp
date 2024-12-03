@@ -147,7 +147,7 @@ namespace add_objects_panel
         RCLCPP_INFO(node_->get_logger(), "Deleting the following object: %s", name.c_str());
     }
 
-    void AddObjectsPanel::displayMessge(std::string msg){
+    void AddObjectsPanel::displayMessage(std::string msg){
         // show message in UI
         QString Qmsg = msg.c_str();
         ui_->labelMessage->setText(Qmsg);
