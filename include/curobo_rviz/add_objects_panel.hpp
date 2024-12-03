@@ -28,7 +28,7 @@ namespace add_objects_panel
         std::shared_ptr<curobo_msgs::srv::AddObject_Request> add_object_request_;
         rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_publisher_;
         rclcpp::Publisher<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_publisher_;
-        QTimer *timerConfirmChangesMessage_;
+        QTimer *timerMessage_;
 
         void displayMessage(std::string msg);
     };

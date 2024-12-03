@@ -11,7 +11,7 @@ namespace add_objects_panel
         , add_object_request_ {nullptr}
         , add_object_publisher_{nullptr}
         , remove_object_publisher_{nullptr}
-        , timerConfirmChangesMessage_{nullptr}
+        , timerMessage_{nullptr}
     {
         // Extend the widget with all attributes and children from UI file
         ui_->setupUi(this);
@@ -41,8 +41,8 @@ namespace add_objects_panel
         ui_->lineEditMeshPath->setPlaceholderText("path/to/mesh");
 
         // create a timer to show labelMessage for 5 seconds
-        timerConfirmChangesMessage_ = new QTimer(this);
-        connect(timerConfirmChangesMessage_, SIGNAL(timeout()), ui_->labelMessage, SLOT(clear()));
+        timerMessage_ = new QTimer(this);
+        connect(timerMessage_, SIGNAL(timeout()), ui_->labelMessage, SLOT(clear()));
 
         RCLCPP_INFO(node_->get_logger(), "Initialized objects panel");
     }
