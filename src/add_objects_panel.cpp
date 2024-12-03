@@ -69,16 +69,16 @@ namespace add_objects_panel
         double colorB = ui_->doubleSpinBoxColorB->value();
         double colorA = ui_->doubleSpinBoxColorA->value();
         int type = ui_->comboBoxObjects->currentData().toInt();
-        // TODO: Check if name is unique. else : error message
         std::string name = ui_->lineEditName->displayText().toStdString();
         std::string mesh_file_path = "";
         if (name.empty()) {
-            // TODO: modify label to show message
+            displayMessage("The object must have a name. Can't make it empty");
             RCLCPP_WARN(node_->get_logger(), "The object must have a name. Can't make it empty");
             return;
         }
+        // TODO: Check if name is unique. else : error message
         if (type == curobo_msgs::srv::AddObject_Request::MESH && mesh_file_path.empty()) {
-            // TODO: modify label to show message
+            displayMessage("The mesh path must be specified. Can't make it empty");
             RCLCPP_WARN(node_->get_logger(), "The mesh path must be specified. Can't make it empty");
             return;
         }
@@ -126,7 +126,7 @@ namespace add_objects_panel
                 add_object_publisher_->publish(*add_object_request_);
 
                 // add item to QListWidget
-                QString objectDisplayText = QString("%s {pos: %f, %f, %f}{ori: %f, %f, %f, %f}")
+                QString objectDisplayText = QString("%1 {pos: %2, %3, %4}{ori: %5, %6, %7, %8}")
                                                     .arg(name.c_str()).arg(posX).arg(posY).arg(posZ)
                                                     .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW); // TODO: fix args cause the values aren't taken
                 QListWidgetItem* objectItem = new QListWidgetItem(objectDisplayText);
@@ -135,10 +135,7 @@ namespace add_objects_panel
             } else {
                 RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
             }
-            // show message in UI
-            QString msg = result->message.c_str();
-            ui_->labelMessage->setText(msg);
-            timerMessage_->start(5000); // 5 seconds
+            displayMessage(result->message);
         } else {
             RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
         }
@@ -148,6 +145,13 @@ namespace add_objects_panel
     {
         std::string name = "temp_name";
         RCLCPP_INFO(node_->get_logger(), "Deleting the following object: %s", name.c_str());
+    }
+
+    void AddObjectsPanel::displayMessge(std::string msg){
+        // show message in UI
+        QString Qmsg = msg.c_str();
+        ui_->labelMessage->setText(Qmsg);
+        timerMessage_->start(5000); // 5 seconds
     }
 } // add_objects_panel
 
