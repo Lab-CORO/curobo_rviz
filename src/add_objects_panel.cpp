@@ -92,26 +92,26 @@ namespace add_objects_panel
 
         // setup request
         // auto add_object_request_ = curobo_msgs::srv::AddObject_Request();
-        add_object_request_.type = type;
-        add_object_request_.name = name;
-        add_object_request_.pose.position.x = posX;
-        add_object_request_.pose.position.y = posY;
-        add_object_request_.pose.position.z = posZ;
-        add_object_request_.pose.orientation.x = orientationX;
-        add_object_request_.pose.orientation.y = orientationY;
-        add_object_request_.pose.orientation.z = orientationZ;
-        add_object_request_.pose.orientation.w = orientationW;
-        add_object_request_.dimensions.x = dimX;
-        add_object_request_.dimensions.y = dimY;
-        add_object_request_.dimensions.z = dimZ;
-        add_object_request_.color.r = colorR;
-        add_object_request_.color.g = colorG;
-        add_object_request_.color.b = colorB;
-        add_object_request_.color.a = colorA;
+        add_object_request_->type = type;
+        add_object_request_->name = name;
+        add_object_request_->pose.position.x = posX;
+        add_object_request_->pose.position.y = posY;
+        add_object_request_->pose.position.z = posZ;
+        add_object_request_->pose.orientation.x = orientationX;
+        add_object_request_->pose.orientation.y = orientationY;
+        add_object_request_->pose.orientation.z = orientationZ;
+        add_object_request_->pose.orientation.w = orientationW;
+        add_object_request_->dimensions.x = dimX;
+        add_object_request_->dimensions.y = dimY;
+        add_object_request_->dimensions.z = dimZ;
+        add_object_request_->color.r = colorR;
+        add_object_request_->color.g = colorG;
+        add_object_request_->color.b = colorB;
+        add_object_request_->color.a = colorA;
 
         // call Add Objects with parameters
         // TODO: if the call works, call the display. else: error message
-        auto future = add_object_client_->async_send_request(add_object_request_);
+        auto future = add_object_client_->async_send_request(*add_object_request_);
         if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
             auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
             if (result->success) {
