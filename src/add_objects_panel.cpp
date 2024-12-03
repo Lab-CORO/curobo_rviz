@@ -111,14 +111,14 @@ namespace add_objects_panel
 
         // call Add Objects with parameters
         // TODO: if the call works, call the display. else: error message
-        auto future = add_object_client_->async_send_request(*add_object_request_);
+        auto future = add_object_client_->async_send_request(add_object_request_);
         if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
             auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
             if (result->success) {
                 RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
 
                 // call Display service to add the object on the screen
-                add_object_publisher_->publish(add_object_request_);
+                add_object_publisher_->publish(*add_object_request_);
 
                 // add item to QListWidget
                 QString objectDisplayText = QString("%s {pos: %f, %f, %f}{ori: %f, %f, %f, %f}")
