@@ -40,9 +40,9 @@ namespace add_objects_panel
         ui_->lineEditName->setPlaceholderText("object_name");
         ui_->lineEditMeshPath->setPlaceholderText("path/to/mesh");
 
-        // create a timer to show labelConfirmChangesMessage for 5 seconds
+        // create a timer to show labelMessage for 5 seconds
         timerConfirmChangesMessage_ = new QTimer(this);
-        connect(timerConfirmChangesMessage_, SIGNAL(timeout()), ui_->labelConfirmChangesMessage, SLOT(clear()));
+        connect(timerConfirmChangesMessage_, SIGNAL(timeout()), ui_->labelMessage, SLOT(clear()));
 
         RCLCPP_INFO(node_->get_logger(), "Initialized objects panel");
     }

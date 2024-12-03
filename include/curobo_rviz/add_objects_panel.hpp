@@ -30,6 +30,6 @@ namespace add_objects_panel
         rclcpp::Publisher<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_publisher_;
         QTimer *timerConfirmChangesMessage_;
 
-        void displayMessage(QString msg);
+        void displayMessage(std::string msg);
     };
 }
