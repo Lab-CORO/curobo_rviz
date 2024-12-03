@@ -25,7 +25,7 @@ namespace add_objects_panel
         std::unique_ptr<Ui::gui_objects> ui_;
         rclcpp::Node::SharedPtr node_;
         rclcpp::Client<curobo_msgs::srv::AddObject>::SharedPtr add_object_client_;
-        rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_request_;
+        std::shared_ptr<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_request_;
         rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_publisher_;
         rclcpp::Publisher<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_publisher_;
     };

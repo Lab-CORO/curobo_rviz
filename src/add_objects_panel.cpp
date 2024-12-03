@@ -8,7 +8,7 @@ namespace add_objects_panel
         , ui_{std::make_unique<Ui::gui_objects>()}
         , node_{nullptr}
         , add_object_client_{nullptr}
-        , add_object_request {nullptr}
+        , add_object_request_ {nullptr}
         , add_object_publisher_{nullptr}
         , remove_object_publisher_{nullptr}
     {
