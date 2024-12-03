@@ -8,6 +8,7 @@ namespace add_objects_panel
         , ui_{std::make_unique<Ui::gui_objects>()}
         , node_{nullptr}
         , add_object_client_{nullptr}
+        , add_object_request {nullptr}
         , add_object_publisher_{nullptr}
         , remove_object_publisher_{nullptr}
     {
@@ -20,6 +21,8 @@ namespace add_objects_panel
 
         // create Add_objects service
         add_object_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/curobo_gen_traj/add_object");
+        add_object_request_ = std::make_shared<curobo_msgs::srv::AddObject_Request>();
+        // TODO: Add remove object service
 
         // create publisher so Display can retrieve the parameters to add objects
         add_object_publisher_ = node_->create_publisher<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10);
@@ -88,7 +91,7 @@ namespace add_objects_panel
                                             colorR, colorG, colorB, colorA);
 
         // setup request
-        auto add_object_request_ = curobo_msgs::srv::AddObject_Request();
+        // auto add_object_request_ = curobo_msgs::srv::AddObject_Request();
         add_object_request_.type = type;
         add_object_request_.name = name;
         add_object_request_.pose.position.x = posX;
@@ -108,18 +111,32 @@ namespace add_objects_panel
 
         // call Add Objects with parameters
         // TODO: if the call works, call the display. else: error message
+        auto future = add_object_client_->async_send_request(add_object_request_);
+        if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
+            auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
+            if (result->success) {
+                RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
 
+                // call Display service to add the object on the screen
+                add_object_publisher_->publish(add_object_request_);
 
-        // call Display service to add the object on the screen
-        add_object_publisher_->publish(add_object_request_);
-
-        // add item to QListWidget
-        QString objectDisplayText = QString("%s {pos: %f, %f, %f}{ori: %f, %f, %f, %f}")
-                                            .arg(name.c_str()).arg(posX).arg(posY).arg(posZ)
-                                            .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW); // TODO: fix args cause the values aren't taken
-        QListWidgetItem* objectItem = new QListWidgetItem(objectDisplayText);
-        objectItem->setData(Qt::UserRole, QVariant(QString::fromStdString(name))); // store name as data for the remove service
-        ui_->listWidgetObjects->addItem(objectItem);
+                // add item to QListWidget
+                QString objectDisplayText = QString("%s {pos: %f, %f, %f}{ori: %f, %f, %f, %f}")
+                                                    .arg(name.c_str()).arg(posX).arg(posY).arg(posZ)
+                                                    .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW); // TODO: fix args cause the values aren't taken
+                QListWidgetItem* objectItem = new QListWidgetItem(objectDisplayText);
+                objectItem->setData(Qt::UserRole, QVariant(QString::fromStdString(name))); // store name as data for the remove service
+                ui_->listWidgetObjects->addItem(objectItem);           
+            } else {
+                RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
+            }
+            // show message in UI
+            // QString msg = result->message.c_str();
+            // ui_->labelMessage->setText(msg);
+            // timerMessage_->start(5000); // 5 seconds
+        } else {
+            RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
+        }
     }
 
     void AddObjectsPanel::on_pushButtonRemove_clicked()
