@@ -11,6 +11,7 @@ namespace add_objects_panel
         , add_object_request_ {nullptr}
         , add_object_publisher_{nullptr}
         , remove_object_publisher_{nullptr}
+        , timerConfirmChangesMessage_{nullptr}
     {
         // Extend the widget with all attributes and children from UI file
         ui_->setupUi(this);
@@ -38,6 +39,10 @@ namespace add_objects_panel
         // put placeholders
         ui_->lineEditName->setPlaceholderText("object_name");
         ui_->lineEditMeshPath->setPlaceholderText("path/to/mesh");
+
+        // create a timer to show labelConfirmChangesMessage for 5 seconds
+        timerConfirmChangesMessage_ = new QTimer(this);
+        connect(timerConfirmChangesMessage_, SIGNAL(timeout()), ui_->labelConfirmChangesMessage, SLOT(clear()));
 
         RCLCPP_INFO(node_->get_logger(), "Initialized objects panel");
     }
@@ -131,9 +136,9 @@ namespace add_objects_panel
                 RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
             }
             // show message in UI
-            // QString msg = result->message.c_str();
-            // ui_->labelMessage->setText(msg);
-            // timerMessage_->start(5000); // 5 seconds
+            QString msg = result->message.c_str();
+            ui_->labelMessage->setText(msg);
+            timerMessage_->start(5000); // 5 seconds
         } else {
             RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
         }
