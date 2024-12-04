@@ -86,7 +86,7 @@ namespace add_objects_display
         RCLCPP_INFO(node_->get_logger(), "Removed object named: %s", request->name.c_str());
     }
 
-    void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape> shape)
+    void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
         shape->setColor(color_property_->getOgreColor());
