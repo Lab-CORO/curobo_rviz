@@ -143,9 +143,9 @@ namespace add_objects_panel
 
     void AddObjectsPanel::on_pushButtonRemove_clicked()
     {
-        QList<QListWidgetItem *> selectedItems = listWidgetObjects->selectedItems();
+        QList<QListWidgetItem *> selectedItems = ui_->listWidgetObjects->selectedItems();
         for (int i = 0; i < selectedItems.size(); i++) {
-            std::string name = selectedItems.at(i).data()->toStdString();
+            std::string name = selectedItems.at(i)->data()->toStdString();
             RCLCPP_INFO(node_->get_logger(), "Selected item name: %s", name.c_str());
         }
         // std::string name = "temp_name";

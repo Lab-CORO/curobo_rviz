@@ -75,7 +75,7 @@ namespace add_objects_display
 
     void AddObjectsDisplay::onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
     {
-        Shape shape = shapeMap.find(request->name);
+        std::unique_ptr<rviz_rendering::Shape> shape = shapeMap.find(request->name);
         if (shape == shapeMape.end() {
             RCLCPP_WARN(node_->get_logger(), "Couldn't remove the shape");
             return;

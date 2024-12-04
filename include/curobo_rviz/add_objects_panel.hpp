@@ -22,7 +22,7 @@ namespace add_objects_panel
         void on_pushButtonRemove_clicked();
 
     protected:
-        void AddObjectsPanel::displayMessage(std::string msg);
+        void displayMessage(std::string msg);
 
     private:
         std::unique_ptr<Ui::gui_objects> ui_;
