@@ -20,13 +20,12 @@ namespace add_objects_display
 
     AddObjectsDisplay::~AddObjectsDisplay()
     {
-        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::~AddObjectsDisplay()");
     }
 
     void AddObjectsDisplay::onInitialize()
     {
         auto options = rclcpp::NodeOptions().arguments(
-        {"--ros-args", "--remap", "__node:=rviz_add_objects_display_node", "--"});
+                            {"--ros-args", "--remap", "__node:=rviz_display_objects_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
         add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::onAddUpdate, this, std::placeholders::_1));
@@ -35,7 +34,7 @@ namespace add_objects_display
         shapeMap_ = std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>>();
         // shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
         
-        color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(204, 51, 204), "Color to draw the object.", this, SLOT(updateStyle()));
+        // color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(204, 51, 204), "Color to draw the object.", this, SLOT(updateStyle()));
         // updateStyle();
         
         //shape_.reset();
@@ -51,9 +50,13 @@ namespace add_objects_display
         Ogre::Vector3 position;
         Ogre::Quaternion orientation;
 
-        scene_node_->setPosition(position);
-        scene_node_->setOrientation(orientation);
+        //scene_node_->setPosition(position);
+        //scene_node_->setOrientation(orientation);
 
+        shape->setPosition(Ogre::Vector3(
+                                request->pose.position.x,
+                                request->pose.position.y,
+                                request->pose.position.z));
         shape->setOrientation(Ogre::Quaternion(
                                 request->pose.orientation.x,
                                 request->pose.orientation.y,
@@ -63,12 +66,8 @@ namespace add_objects_display
                                 request->dimensions.x,
                                 request->dimensions.y,
                                 request->dimensions.z));
-        shape->setPosition(Ogre::Vector3(
-                                request->pose.position.x,
-                                request->pose.position.y,
-                                request->pose.position.z));
-        color_property_->setColor(QColor(request->color.r, request->color.g, request->color.b));
-        updateStyle(shape);
+        shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
+        //updateStyle(shape);
 
         shapeMap_[request->name] = std::move(shape);
     }
@@ -86,11 +85,11 @@ namespace add_objects_display
         RCLCPP_INFO(node_->get_logger(), "Removed object named: %s", request->name.c_str());
     }
 
-    void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)
-    {
-        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
-        shape->setColor(color_property_->getOgreColor());
-    }
+    // void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)
+    // {
+    //     RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
+    //     shape->setColor(color_property_->getOgreColor());
+    // }
 } // add_objects_display
 
 #include <pluginlib/class_list_macros.hpp>
