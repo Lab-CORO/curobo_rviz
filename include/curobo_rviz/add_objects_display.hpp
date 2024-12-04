@@ -21,22 +21,20 @@ namespace add_objects_display
         explicit AddObjectsDisplay();
         ~AddObjectsDisplay();
 
-    private Q_SLOTS:
-        void updateStyle();
 
     protected:
         void onInitialize() override;
         void onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request);
         void onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request);
+        void updateStyle(rviz_rendering::Shape shape);
 
-        std::unique_ptr<rviz_rendering::Shape> shape_;
         std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
     
     private:
         rclcpp::Node::SharedPtr node_;
         rclcpp::Subscription<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_subscriber_;
         rclcpp::Subscription<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_subscriber_;
-        std::unordered_map<rviz_rendering::Shape> shapeMap_;
+        std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>> shapeMap_;
     };
 } // namespace add_objects_display
 

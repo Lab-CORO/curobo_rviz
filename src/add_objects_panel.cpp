@@ -145,14 +145,14 @@ namespace add_objects_panel
     {
         QList<QListWidgetItem *> selectedItems = listWidgetObjects->selectedItems();
         for (int i = 0; i < selectedItems.size(); i++) {
-            std::string name = selectedItems.at(i)->data()->toStdString();
+            std::string name = selectedItems.at(i).data()->toStdString();
             RCLCPP_INFO(node_->get_logger(), "Selected item name: %s", name.c_str());
         }
         // std::string name = "temp_name";
         // RCLCPP_INFO(node_->get_logger(), "Deleting the following object: %s", name.c_str());
     }
 
-    void AddObjectsPanel::displayMessage(std::string msg){
+    void AddObjectsPanel::displayMessage(std::string msg) {
         // show message in UI
         QString Qmsg = msg.c_str();
         ui_->labelMessage->setText(Qmsg);

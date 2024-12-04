@@ -10,7 +10,6 @@ namespace add_objects_display
     
     AddObjectsDisplay::AddObjectsDisplay()
         : Display{}
-        , shape_{nullptr}
         , color_property_{nullptr}
         , node_{nullptr}
         , add_object_subscriber_{nullptr}
@@ -33,11 +32,11 @@ namespace add_objects_display
         add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::onAddUpdate, this, std::placeholders::_1));
         remove_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10, std::bind(&AddObjectsDisplay::onRemoveUpdate, this, std::placeholders::_1));
         
-        shapeMap_ = std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>>;
+        shapeMap_ = std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>>();
         // shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
         
         color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(204, 51, 204), "Color to draw the object.", this, SLOT(updateStyle()));
-        updateStyle();
+        // updateStyle();
         
         //shape_.reset();
         RCLCPP_INFO(node_->get_logger(), "Initialized objects display");
@@ -47,7 +46,7 @@ namespace add_objects_display
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
         
-        rviz_rendering::Shape shape = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
+        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
 
         Ogre::Vector3 position;
         Ogre::Quaternion orientation;

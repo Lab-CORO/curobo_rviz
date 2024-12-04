@@ -21,6 +21,9 @@ namespace add_objects_panel
         void on_pushButtonAdd_clicked();
         void on_pushButtonRemove_clicked();
 
+    protected:
+        void AddObjectsPanel::displayMessage(std::string msg);
+
     private:
         std::unique_ptr<Ui::gui_objects> ui_;
         rclcpp::Node::SharedPtr node_;
