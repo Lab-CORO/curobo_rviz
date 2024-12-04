@@ -15,6 +15,7 @@ namespace add_objects_display
         , node_{nullptr}
         , add_object_subscriber_{nullptr}
         , remove_object_subscriber_{nullptr}
+        , shapeMap_{nullptr}
     {
     }
 
@@ -25,8 +26,6 @@ namespace add_objects_display
 
     void AddObjectsDisplay::onInitialize()
     {
-        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::onInitialize()");
-
         auto options = rclcpp::NodeOptions().arguments(
         {"--ros-args", "--remap", "__node:=rviz_add_objects_display_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
@@ -34,22 +33,21 @@ namespace add_objects_display
         add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::onAddUpdate, this, std::placeholders::_1));
         remove_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10, std::bind(&AddObjectsDisplay::onRemoveUpdate, this, std::placeholders::_1));
         
-        shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
+        shapeMap_ = std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>>;
+        // shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
         
         color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(204, 51, 204), "Color to draw the object.", this, SLOT(updateStyle()));
         updateStyle();
         
-        shape_.reset();
+        //shape_.reset();
+        RCLCPP_INFO(node_->get_logger(), "Initialized objects display");
     }
 
     void AddObjectsDisplay::onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
         
-        if (!shape_) {
-            RCLCPP_WARN(rclcpp::get_logger("AddObjectsDisplay"), "Shape is not initialized.");
-            return;
-        }
+        rviz_rendering::Shape shape = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
 
         Ogre::Vector3 position;
         Ogre::Quaternion orientation;
@@ -57,32 +55,41 @@ namespace add_objects_display
         scene_node_->setPosition(position);
         scene_node_->setOrientation(orientation);
 
-        shape_->setOrientation(Ogre::Quaternion(
+        shape->setOrientation(Ogre::Quaternion(
                                 request->pose.orientation.x,
                                 request->pose.orientation.y,
                                 request->pose.orientation.z,
                                 request->pose.orientation.w));
-        shape_->setScale(Ogre::Vector3(
+        shape->setScale(Ogre::Vector3(
                                 request->dimensions.x,
                                 request->dimensions.y,
                                 request->dimensions.z));
-        shape_->setPosition(Ogre::Vector3(
+        shape->setPosition(Ogre::Vector3(
                                 request->pose.position.x,
                                 request->pose.position.y,
                                 request->pose.position.z));
         color_property_->setColor(QColor(request->color.r, request->color.g, request->color.b));
-        updateStyle();
+        updateStyle(shape);
+
+        shapeMap_[key] = std::move(shape);
     }
 
     void AddObjectsDisplay::onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
     {
-        shape_.reset();
+        Shape shape = shapeMap.find(request->name);
+        if (shape == shapeMape.end() {
+            RCLCPP_WARN(node_->get_logger(), "Couldn't remove the shape");
+            return;
+        })
+        shapeMap.erase(request->name);
+        shape.reset();
+        RCLCPP_INFO(node_->get_logger(), "Removed object named: %s", request->name.c_str());
     }
 
-    void AddObjectsDisplay::updateStyle()
+    void AddObjectsDisplay::updateStyle(rviz_rendering::Shape shape)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
-        shape_->setColor(color_property_->getOgreColor());
+        shape->setColor(color_property_->getOgreColor());
     }
 } // add_objects_display
 

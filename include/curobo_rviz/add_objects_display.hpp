@@ -3,6 +3,7 @@
 #ifndef ADD_OBJECTS_DISPLAY__ADD_OBJECTS_DISPLAY_HPP_
 #define ADD_OBJECTS_DISPLAY__ADD_OBJECTS_DISPLAY_HPP_
 
+#include <unordered_map>
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/ros_topic_display.hpp>
 #include <rviz_common/properties/color_property.hpp>
@@ -35,6 +36,7 @@ namespace add_objects_display
         rclcpp::Node::SharedPtr node_;
         rclcpp::Subscription<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_subscriber_;
         rclcpp::Subscription<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_subscriber_;
+        std::unordered_map<rviz_rendering::Shape> shapeMap_;
     };
 } // namespace add_objects_display
 
