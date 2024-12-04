@@ -9,10 +9,10 @@ namespace add_objects_panel
         , node_{nullptr}
         , add_object_client_{nullptr}
         , add_object_request_ {nullptr}
+        , remove_object_client_{nullptr}
+        , remove_object_request_{nullptr}
         , add_object_publisher_{nullptr}
         , remove_object_publisher_{nullptr}
-        , remove_object_request_{nullptr}
-        , remove_object_client_{nullptr}
         , timerMessage_{nullptr}
     {
         // Extend the widget with all attributes and children from UI file
@@ -153,7 +153,7 @@ namespace add_objects_panel
 
             std::string name = selectedItems.at(i)->data(Qt::UserRole).toString().toStdString();
             remove_object_request_->name = name;
-            auto future = remove_object_client_->async_send_request(request);
+            auto future = remove_object_client_->async_send_request(remove_object_request_);
 
             if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
                 auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
