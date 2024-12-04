@@ -143,8 +143,13 @@ namespace add_objects_panel
 
     void AddObjectsPanel::on_pushButtonRemove_clicked()
     {
-        std::string name = "temp_name";
-        RCLCPP_INFO(node_->get_logger(), "Deleting the following object: %s", name.c_str());
+        QList<QListWidgetItem *> selectedItems = listWidgetObjects->selectedItems();
+        for (int i = 0; i < selectedItems.size(); i++) {
+            std::string name = selectedItems.at(i)->data()->toStdString();
+            RCLCPP_INFO(node_->get_logger(), "Selected item name: %s", name.c_str());
+        }
+        // std::string name = "temp_name";
+        // RCLCPP_INFO(node_->get_logger(), "Deleting the following object: %s", name.c_str());
     }
 
     void AddObjectsPanel::displayMessage(std::string msg){
