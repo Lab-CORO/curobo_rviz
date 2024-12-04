@@ -62,7 +62,7 @@ namespace add_objects_display
         shape->setScale(Ogre::Vector3(
                                 request->dimensions.x,
                                 request->dimensions.y,
-                                request->dimensions.z));
+                                request->dimensins.z));
         shape->setPosition(Ogre::Vector3(
                                 request->pose.position.x,
                                 request->pose.position.y,
@@ -70,22 +70,22 @@ namespace add_objects_display
         color_property_->setColor(QColor(request->color.r, request->color.g, request->color.b));
         updateStyle(shape);
 
-        shapeMap_[key] = std::move(shape);
+        shapeMap_[request->name] = std::move(shape);
     }
 
     void AddObjectsDisplay::onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
     {
-        std::unique_ptr<rviz_rendering::Shape> shape = shapeMap.find(request->name);
-        if (shape == shapeMape.end() {
+        std::unique_ptr<rviz_rendering::Shape> shape = shapeMap_.find(request->name);
+        if (shape == shapeMap_.end()) {
             RCLCPP_WARN(node_->get_logger(), "Couldn't remove the shape");
             return;
         })
-        shapeMap.erase(request->name);
+        shapeMap_.erase(request->name);
         shape.reset();
         RCLCPP_INFO(node_->get_logger(), "Removed object named: %s", request->name.c_str());
     }
 
-    void AddObjectsDisplay::updateStyle(rviz_rendering::Shape shape)
+    void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape> shape)
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
         shape->setColor(color_property_->getOgreColor());
