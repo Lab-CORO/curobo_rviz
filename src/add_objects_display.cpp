@@ -45,10 +45,11 @@ namespace add_objects_display
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
         
-        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
-
         Ogre::Vector3 position;
         Ogre::Quaternion orientation;
+        Ogre::SceneNode* sceneNode = scene_node_->createChildSceneNode();
+
+        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, sceneNode);
 
         //scene_node_->setPosition(position);
         //scene_node_->setOrientation(orientation);
