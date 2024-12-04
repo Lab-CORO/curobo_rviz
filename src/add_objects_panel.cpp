@@ -145,7 +145,7 @@ namespace add_objects_panel
     {
         QList<QListWidgetItem *> selectedItems = ui_->listWidgetObjects->selectedItems();
         for (int i = 0; i < selectedItems.size(); i++) {
-            std::string name = selectedItems.at(i)->data().toString().toStdString();
+            std::string name = selectedItems.at(i)->data(Qt::UserRole).toString().toStdString();
             RCLCPP_INFO(node_->get_logger(), "Selected item name: %s", name.c_str());
         }
         // std::string name = "temp_name";

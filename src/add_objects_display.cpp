@@ -14,7 +14,7 @@ namespace add_objects_display
         , node_{nullptr}
         , add_object_subscriber_{nullptr}
         , remove_object_subscriber_{nullptr}
-        , shapeMap_{nullptr}
+        , shapeMap_{}
     {
     }
 
@@ -62,7 +62,7 @@ namespace add_objects_display
         shape->setScale(Ogre::Vector3(
                                 request->dimensions.x,
                                 request->dimensions.y,
-                                request->dimensins.z));
+                                request->dimensions.z));
         shape->setPosition(Ogre::Vector3(
                                 request->pose.position.x,
                                 request->pose.position.y,
