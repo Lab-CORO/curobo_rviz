@@ -10,7 +10,7 @@ namespace add_objects_display
     
     AddObjectsDisplay::AddObjectsDisplay()
         : Display{}
-        , color_property_{nullptr}
+        // , color_property_{nullptr}
         , node_{nullptr}
         , add_object_subscriber_{nullptr}
         , remove_object_subscriber_{nullptr}
@@ -47,7 +47,7 @@ namespace add_objects_display
         
         Ogre::Vector3 position;
         Ogre::Quaternion orientation;
-
+        // TODO: enum type for shape https://docs.ros.org/en/humble/p/rviz_rendering/generated/classrviz__rendering_1_1Shape.html#_CPPv4N14rviz_rendering5Shape4TypeE
         std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
 
         //scene_node_->setPosition(position);

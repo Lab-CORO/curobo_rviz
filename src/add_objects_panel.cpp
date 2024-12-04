@@ -11,6 +11,8 @@ namespace add_objects_panel
         , add_object_request_ {nullptr}
         , add_object_publisher_{nullptr}
         , remove_object_publisher_{nullptr}
+        , remove_object_request_{nullptr}
+        , remove_object_client_{nullptr}
         , timerMessage_{nullptr}
     {
         // Extend the widget with all attributes and children from UI file
@@ -20,12 +22,14 @@ namespace add_objects_panel
         {"--ros-args", "--remap", "__node:=rviz_add_objects_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
-        // create Add_objects service
+        // create add_objects & remove_objects service
         add_object_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/curobo_gen_traj/add_object");
         add_object_request_ = std::make_shared<curobo_msgs::srv::AddObject_Request>();
-        // TODO: Add remove object service
+        remove_object_client_ = node_->create_client<curobo_msgs::srv::RemoveObject>("/curobo_gen_traj/remove_object");
+        remove_object_request_ = std::make_shared<curobo_msgs::srv::RemoveObject_Request>();
 
-        // create publisher so Display can retrieve the parameters to add objects
+
+        // create publisher so Display can retrieve the parameters to add objects and remove them
         add_object_publisher_ = node_->create_publisher<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10);
         remove_object_publisher_ = node_->create_publisher<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10);
 
@@ -71,12 +75,13 @@ namespace add_objects_panel
         int type = ui_->comboBoxObjects->currentData().toInt();
         std::string name = ui_->lineEditName->displayText().toStdString();
         std::string mesh_file_path = "";
+
+        // if name is not unique -> checked by the service
         if (name.empty()) {
             displayMessage("The object must have a name. Can't make it empty");
             RCLCPP_WARN(node_->get_logger(), "The object must have a name. Can't make it empty");
             return;
         }
-        // TODO: Check if name is unique. else : error message
         if (type == curobo_msgs::srv::AddObject_Request::MESH && mesh_file_path.empty()) {
             displayMessage("The mesh path must be specified. Can't make it empty");
             RCLCPP_WARN(node_->get_logger(), "The mesh path must be specified. Can't make it empty");
@@ -115,7 +120,6 @@ namespace add_objects_panel
         add_object_request_->color.a = colorA;
 
         // call Add Objects with parameters
-        // TODO: if the call works, call the display. else: error message
         auto future = add_object_client_->async_send_request(add_object_request_);
         if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
             auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
@@ -128,7 +132,7 @@ namespace add_objects_panel
                 // add item to QListWidget
                 QString objectDisplayText = QString("%1 {pos: %2, %3, %4}{ori: %5, %6, %7, %8}")
                                                     .arg(name.c_str()).arg(posX).arg(posY).arg(posZ)
-                                                    .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW); // TODO: fix args cause the values aren't taken
+                                                    .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW);
                 QListWidgetItem* objectItem = new QListWidgetItem(objectDisplayText);
                 objectItem->setData(Qt::UserRole, QVariant(QString::fromStdString(name))); // store name as data for the remove service
                 ui_->listWidgetObjects->addItem(objectItem);           
@@ -144,12 +148,32 @@ namespace add_objects_panel
     void AddObjectsPanel::on_pushButtonRemove_clicked()
     {
         QList<QListWidgetItem *> selectedItems = ui_->listWidgetObjects->selectedItems();
+
         for (int i = 0; i < selectedItems.size(); i++) {
+
             std::string name = selectedItems.at(i)->data(Qt::UserRole).toString().toStdString();
-            RCLCPP_INFO(node_->get_logger(), "Selected item name: %s", name.c_str());
+            remove_object_request_->name = name;
+            auto future = remove_object_client_->async_send_request(request);
+
+            if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
+                auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
+                
+                if (result->success) {
+                    // call Display service to remove the object from screen
+                    remove_object_publisher_->publish(*remove_object_request_);
+                    // remove item from QListWidget
+                    ui_->listWidgetObjects->removeItemWidget(selectedItems.at(i));           
+                    
+                    RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
+
+                } else {
+                    RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
+                }
+                displayMessage(result->message);
+            } else {
+                RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
+            }
         }
-        // std::string name = "temp_name";
-        // RCLCPP_INFO(node_->get_logger(), "Deleting the following object: %s", name.c_str());
     }
 
     void AddObjectsPanel::displayMessage(std::string msg) {

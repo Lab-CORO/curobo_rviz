@@ -88,7 +88,10 @@
     <double>-200.000000000000000</double>
    </property>
    <property name="maximum">
-    <double>200.000000000000000</double>
+    <double>5.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
    </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionY">
@@ -104,7 +107,10 @@
     <double>-200.000000000000000</double>
    </property>
    <property name="maximum">
-    <double>200.000000000000000</double>
+    <double>5.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
    </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionZ">
@@ -120,7 +126,10 @@
     <double>-200.000000000000000</double>
    </property>
    <property name="maximum">
-    <double>200.000000000000000</double>
+    <double>5.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="labelOrientation">
@@ -145,6 +154,9 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
+   </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationY">
    <property name="geometry">
@@ -154,6 +166,9 @@
      <width>65</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
    </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationZ">
@@ -165,6 +180,9 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
+   </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationW">
    <property name="geometry">
@@ -174,6 +192,9 @@
      <width>65</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="labelDimensions">
@@ -198,6 +219,12 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="maximum">
+    <double>10.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
+   </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionY">
    <property name="geometry">
@@ -208,6 +235,12 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="maximum">
+    <double>10.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
+   </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionZ">
    <property name="geometry">
@@ -217,6 +250,12 @@
      <width>65</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="maximum">
+    <double>10.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.050000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="labelColor">

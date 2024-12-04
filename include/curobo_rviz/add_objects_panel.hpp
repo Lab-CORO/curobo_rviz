@@ -30,6 +30,8 @@ namespace add_objects_panel
         rclcpp::Client<curobo_msgs::srv::AddObject>::SharedPtr add_object_client_;
         std::shared_ptr<curobo_msgs::srv::AddObject_Request> add_object_request_;
         rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_publisher_;
+        rclcpp::Client<curobo_msgs::srv::RemoveObject>::SharedPtr remove_object_client_;
+        std::shared_ptr<curobo_msgs::srv::RemoveObject_Request> remove_object_request_;
         rclcpp::Publisher<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_publisher_;
         QTimer *timerMessage_;
     };

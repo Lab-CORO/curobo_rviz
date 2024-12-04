@@ -26,9 +26,9 @@ namespace add_objects_display
         void onInitialize() override;
         void onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request);
         void onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request);
-        void updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape);
+        // void updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape);
 
-        std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
+        // std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
     
     private:
         rclcpp::Node::SharedPtr node_;
