@@ -161,7 +161,8 @@ namespace add_objects_panel
                     // call Display service to remove the object from screen
                     remove_object_publisher_->publish(*remove_object_request_);
                     // remove item from QListWidget
-                    ui_->listWidgetObjects->removeItemWidget(selectedItems.at(i));           
+                    ui_->listWidgetObjects->removeItemWidget(selectedItems.at(i));
+                    delete selectedItems.at(i);
                     
                     RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
 
