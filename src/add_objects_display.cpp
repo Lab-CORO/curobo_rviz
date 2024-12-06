@@ -6,6 +6,8 @@
 
 namespace add_objects_display
 {
+    using rviz_common::properties::StatusProperty;
+    
     AddObjectsDisplay::AddObjectsDisplay()
         : Display{}
         , node_{nullptr}
