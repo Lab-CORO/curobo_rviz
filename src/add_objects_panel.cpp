@@ -28,7 +28,6 @@ namespace add_objects_panel
         remove_object_client_ = node_->create_client<curobo_msgs::srv::RemoveObject>("/curobo_gen_traj/remove_object");
         remove_object_request_ = std::make_shared<curobo_msgs::srv::RemoveObject_Request>();
 
-
         // create publisher so Display can retrieve the parameters to add objects and remove them
         add_object_publisher_ = node_->create_publisher<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10);
         remove_object_publisher_ = node_->create_publisher<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10);

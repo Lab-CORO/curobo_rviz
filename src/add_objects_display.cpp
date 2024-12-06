@@ -50,9 +50,6 @@ namespace add_objects_display
         // TODO: enum type for shape https://docs.ros.org/en/humble/p/rviz_rendering/generated/classrviz__rendering_1_1Shape.html#_CPPv4N14rviz_rendering5Shape4TypeE
         std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
 
-        //scene_node_->setPosition(position);
-        //scene_node_->setOrientation(orientation);
-
         shape->setPosition(Ogre::Vector3(
                                 request->pose.position.x,
                                 request->pose.position.y,
@@ -68,6 +65,9 @@ namespace add_objects_display
                                 request->dimensions.z));
         shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
         //updateStyle(shape);
+
+        scene_node_->setPosition(position);
+        scene_node_->setOrientation(orientation);
 
         shapeMap_[request->name] = std::move(shape);
     }
