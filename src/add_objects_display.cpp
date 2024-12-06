@@ -48,9 +48,6 @@ namespace add_objects_display
 
             std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, shapeSceneNode);
 
-            shapeSceneNode->setPosition(position);
-            shapeSceneNode->setOrientation(orientation);
-
             shape->setPosition(Ogre::Vector3(
                                     request->pose.position.x,
                                     request->pose.position.y,
@@ -65,6 +62,9 @@ namespace add_objects_display
                                     request->dimensions.y,
                                     request->dimensions.z));
             shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
+
+            shapeSceneNode->setPosition(position);
+            shapeSceneNode->setOrientation(orientation);
 
             shapeMap_[request->name] = std::move(shape);
         }
