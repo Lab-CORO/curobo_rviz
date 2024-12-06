@@ -32,7 +32,6 @@ namespace add_objects_display
         remove_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10, std::bind(&AddObjectsDisplay::onRemoveUpdate, this, std::placeholders::_1));
         
         shapeMap_ = std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>>();
-        // shape_ = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
         
         // color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(204, 51, 204), "Color to draw the object.", this, SLOT(updateStyle()));
         // updateStyle();
@@ -70,7 +69,7 @@ namespace add_objects_display
                                 request->dimensions.y,
                                 request->dimensions.z));
         shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
-        //updateStyle(shape);
+        updateStyle(shape);
 
         shapeMap_[request->name] = std::move(shape);
     }
@@ -103,11 +102,11 @@ namespace add_objects_display
         throw std::invalid_argument("Unknown shape type: " + type);
     }
 
-    // void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)
-    // {
-    //     RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
-    //     shape->setColor(color_property_->getOgreColor());
-    // }
+    void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)
+    {
+        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
+        shape->setColor(color_property_->getOgreColor());
+    }
 } // add_objects_display
 
 #include <pluginlib/class_list_macros.hpp>
