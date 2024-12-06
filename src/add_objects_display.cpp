@@ -6,11 +6,8 @@
 
 namespace add_objects_display
 {
-    using rviz_common::properties::StatusProperty;
-    
     AddObjectsDisplay::AddObjectsDisplay()
         : Display{}
-        , color_property_{nullptr}
         , node_{nullptr}
         , add_object_subscriber_{nullptr}
         , remove_object_subscriber_{nullptr}
@@ -32,10 +29,7 @@ namespace add_objects_display
         remove_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10, std::bind(&AddObjectsDisplay::onRemoveUpdate, this, std::placeholders::_1));
         
         shapeMap_ = std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>>();
-        
-        color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(02, 04, 204), "Color to draw the object.", this, SLOT(updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)));
-        
-        //shape_.reset();
+
         RCLCPP_INFO(node_->get_logger(), "Initialized objects display");
     }
 
@@ -43,34 +37,39 @@ namespace add_objects_display
     {
         RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
         
-        Ogre::Vector3 position;
-        Ogre::Quaternion orientation;
+        try{
+            Ogre::Vector3 position;
+            Ogre::Quaternion orientation;
 
-        auto shapeType = getShapeType(request->type);
-        Ogre::SceneNode* shapeSceneNode = scene_manager_->createSceneNode();
+            auto shapeType = getShapeType(request->type);
+            Ogre::SceneNode* shapeSceneNode = scene_manager_->createSceneNode();
 
-        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, shapeSceneNode);
+            std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, shapeSceneNode);
 
-        shapeSceneNode->setPosition(position);
-        shapeSceneNode->setOrientation(orientation);
+            shapeSceneNode->setPosition(position);
+            shapeSceneNode->setOrientation(orientation);
 
-        shape->setPosition(Ogre::Vector3(
-                                request->pose.position.x,
-                                request->pose.position.y,
-                                request->pose.position.z));
-        shape->setOrientation(Ogre::Quaternion(
-                                request->pose.orientation.x,
-                                request->pose.orientation.y,
-                                request->pose.orientation.z,
-                                request->pose.orientation.w));
-        shape->setScale(Ogre::Vector3(
-                                request->dimensions.x,
-                                request->dimensions.y,
-                                request->dimensions.z));
-        shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
-        updateStyle(shape);
+            shape->setPosition(Ogre::Vector3(
+                                    request->pose.position.x,
+                                    request->pose.position.y,
+                                    request->pose.position.z));
+            shape->setOrientation(Ogre::Quaternion(
+                                    request->pose.orientation.x,
+                                    request->pose.orientation.y,
+                                    request->pose.orientation.z,
+                                    request->pose.orientation.w));
+            shape->setScale(Ogre::Vector3(
+                                    request->dimensions.x,
+                                    request->dimensions.y,
+                                    request->dimensions.z));
+            shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
 
-        shapeMap_[request->name] = std::move(shape);
+            shapeMap_[request->name] = std::move(shape);
+
+        }
+        catch (const std::exception& e) {
+            RCLCPP_ERROR(node_->get_logger(), "Failed to add shape: %s", e.what());
+        }
     }
 
     void AddObjectsDisplay::onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
@@ -99,12 +98,6 @@ namespace add_objects_display
         if (type == curobo_msgs::srv::AddObject_Request::CYLINDER) return rviz_rendering::Shape::Type::Cylinder;
         if (type == curobo_msgs::srv::AddObject_Request::MESH) return rviz_rendering::Shape::Type::Mesh;
         throw std::invalid_argument("Unknown shape type: " + type);
-    }
-
-    void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)
-    {
-        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::updateStyle()");
-        shape->setColor(color_property_->getOgreColor());
     }
 } // add_objects_display
 
