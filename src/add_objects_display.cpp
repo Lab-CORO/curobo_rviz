@@ -27,6 +27,8 @@ namespace add_objects_display
                             {"--ros-args", "--remap", "__node:=rviz_display_objects_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
+        scene_manager_ = context_->getSceneManager();
+
         add_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10, std::bind(&AddObjectsDisplay::onAddUpdate, this, std::placeholders::_1));
         remove_object_subscriber_ = node_->create_subscription<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10, std::bind(&AddObjectsDisplay::onRemoveUpdate, this, std::placeholders::_1));
         
