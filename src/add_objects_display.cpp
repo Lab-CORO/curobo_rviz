@@ -44,7 +44,7 @@ namespace add_objects_display
             Ogre::Quaternion orientation;
 
             auto shapeType = getShapeType(request->type);
-            Ogre::SceneNode* shapeSceneNode = scene_manager_->createSceneNode();
+            Ogre::SceneNode* shapeSceneNode = scene_manager_->getRootSceneNode()->createChildSceneNode();
 
             std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, shapeSceneNode);
 
@@ -67,7 +67,6 @@ namespace add_objects_display
             shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
 
             shapeMap_[request->name] = std::move(shape);
-
         }
         catch (const std::exception& e) {
             RCLCPP_ERROR(node_->get_logger(), "Failed to add shape: %s", e.what());
