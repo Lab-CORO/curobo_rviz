@@ -39,7 +39,7 @@ namespace add_objects_display
 
     void AddObjectsDisplay::onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
     {
-        RVIZ_COMMON_LOG_INFO("AddObjectsDisplay::processMessage()");
+        RCLCPP_INFO(node_->get_logger(), "Adding object");
         
         try{
             Ogre::Vector3 position;
@@ -77,6 +77,8 @@ namespace add_objects_display
 
     void AddObjectsDisplay::onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
     {
+        RCLCPP_INFO(node_->get_logger(), "Removing object");
+        
         auto it = shapeMap_.find(request->name);
         if (it == shapeMap_.end()) {
             RCLCPP_WARN(node_->get_logger(), "Couldn't remove the shape");
