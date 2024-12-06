@@ -40,39 +40,34 @@ namespace add_objects_display
     void AddObjectsDisplay::onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request)
     {
         RCLCPP_INFO(node_->get_logger(), "Adding object");
-        
-        try{
-            Ogre::Vector3 position;
-            Ogre::Quaternion orientation;
 
-            auto shapeType = getShapeType(request->type);
-            Ogre::SceneNode* shapeSceneNode = scene_manager_->getRootSceneNode()->createChildSceneNode();
+        Ogre::Vector3 position;
+        Ogre::Quaternion orientation;
 
-            std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, shapeSceneNode);
+        auto shapeType = getShapeType(request->type);
+        Ogre::SceneNode* shapeSceneNode = scene_manager_->getRootSceneNode()->createChildSceneNode();
 
-            shape->setPosition(Ogre::Vector3(
-                                    request->pose.position.x,
-                                    request->pose.position.y,
-                                    request->pose.position.z));
-            shape->setOrientation(Ogre::Quaternion(
-                                    request->pose.orientation.x,
-                                    request->pose.orientation.y,
-                                    request->pose.orientation.z,
-                                    request->pose.orientation.w));
-            shape->setScale(Ogre::Vector3(
-                                    request->dimensions.x,
-                                    request->dimensions.y,
-                                    request->dimensions.z));
-            shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
+        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, shapeSceneNode);
 
-            shapeSceneNode->setPosition(position);
-            shapeSceneNode->setOrientation(orientation);
+        shape->setPosition(Ogre::Vector3(
+                                request->pose.position.x,
+                                request->pose.position.y,
+                                request->pose.position.z));
+        shape->setOrientation(Ogre::Quaternion(
+                                request->pose.orientation.x,
+                                request->pose.orientation.y,
+                                request->pose.orientation.z,
+                                request->pose.orientation.w));
+        shape->setScale(Ogre::Vector3(
+                                request->dimensions.x,
+                                request->dimensions.y,
+                                request->dimensions.z));
+        shape->setColor(request->color.r, request->color.g, request->color.b, request->color.a);
 
-            shapeMap_[request->name] = std::move(shape);
-        }
-        catch (const std::exception& e) {
-            RCLCPP_ERROR(node_->get_logger(), "Failed to add shape: %s", e.what());
-        }
+        shapeSceneNode->setPosition(position);
+        shapeSceneNode->setOrientation(orientation);
+
+        shapeMap_[request->name] = std::move(shape);
     }
 
     void AddObjectsDisplay::onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request)
