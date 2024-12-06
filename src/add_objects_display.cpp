@@ -48,12 +48,13 @@ namespace add_objects_display
         Ogre::Vector3 position;
         Ogre::Quaternion orientation;
 
-        scene_node_->setPosition(position);
-        scene_node_->setOrientation(orientation);
-
-        // TODO: enum type for shape https://docs.ros.org/en/humble/p/rviz_rendering/generated/classrviz__rendering_1_1Shape.html#_CPPv4N14rviz_rendering5Shape4TypeE
         auto shapeType = getShapeType(request->type);
-        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, scene_node_);
+        Ogre::SceneNode* shapeSceneNode = scene_manager_->getRootSceneNode()->createChildSceneNode();
+
+        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, shapeSceneNode);
+
+        shapeSceneNode->setPosition(position);
+        shapeSceneNode->setOrientation(orientation);
 
         shape->setPosition(Ogre::Vector3(
                                 request->pose.position.x,
@@ -81,7 +82,10 @@ namespace add_objects_display
             RCLCPP_WARN(node_->get_logger(), "Couldn't remove the shape");
             return;
         }
+
         auto& shape = it->second;
+        Ogre::SceneNode* shapeSceneNode = shape->getSceneNode();
+        scene_manager_->destroySceneNode(shapeSceneNode);
         shapeMap_.erase(it);
         shape.reset();
         RCLCPP_INFO(node_->get_logger(), "Removed object named: %s", request->name.c_str());
