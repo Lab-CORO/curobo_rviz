@@ -44,7 +44,7 @@ namespace add_objects_display
             Ogre::Quaternion orientation;
 
             auto shapeType = getShapeType(request->type);
-            Ogre::SceneNode* shapeSceneNode = scene_manager_->getRootSceneNode()->createChildSceneNode();
+            Ogre::SceneNode* shapeSceneNode = scene_manager_->createChildSceneNode();
 
             std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, shapeSceneNode);
 
