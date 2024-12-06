@@ -10,7 +10,7 @@ namespace add_objects_display
     
     AddObjectsDisplay::AddObjectsDisplay()
         : Display{}
-        // , color_property_{nullptr}
+        , color_property_{nullptr}
         , node_{nullptr}
         , add_object_subscriber_{nullptr}
         , remove_object_subscriber_{nullptr}
@@ -33,8 +33,7 @@ namespace add_objects_display
         
         shapeMap_ = std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>>();
         
-        // color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(204, 51, 204), "Color to draw the object.", this, SLOT(updateStyle()));
-        // updateStyle();
+        color_property_ = std::make_unique<rviz_common::properties::ColorProperty>("Point Color", QColor(02, 04, 204), "Color to draw the object.", this, SLOT(updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)));
         
         //shape_.reset();
         RCLCPP_INFO(node_->get_logger(), "Initialized objects display");

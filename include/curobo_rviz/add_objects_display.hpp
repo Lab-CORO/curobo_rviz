@@ -29,7 +29,7 @@ namespace add_objects_display
         rviz_rendering::Shape::Type getShapeType(const int& type);
         void updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape);
 
-        // std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
+        std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
     
     private:
         rclcpp::Node::SharedPtr node_;
