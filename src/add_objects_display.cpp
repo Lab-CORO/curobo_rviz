@@ -52,7 +52,7 @@ namespace add_objects_display
         scene_node_->setOrientation(orientation);
 
         // TODO: enum type for shape https://docs.ros.org/en/humble/p/rviz_rendering/generated/classrviz__rendering_1_1Shape.html#_CPPv4N14rviz_rendering5Shape4TypeE
-        auto shapeType = getShapeType(request->Type);
+        auto shapeType = getShapeType(request->type);
         std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, scene_node_);
 
         shape->setPosition(Ogre::Vector3(
