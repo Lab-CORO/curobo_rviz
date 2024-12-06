@@ -50,9 +50,10 @@ namespace add_objects_display
 
         scene_node_->setPosition(position);
         scene_node_->setOrientation(orientation);
-        
+
         // TODO: enum type for shape https://docs.ros.org/en/humble/p/rviz_rendering/generated/classrviz__rendering_1_1Shape.html#_CPPv4N14rviz_rendering5Shape4TypeE
-        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(rviz_rendering::Shape::Type::Cube, scene_manager_, scene_node_);
+        auto shapeType = getShapeType(request->Type);
+        std::unique_ptr<rviz_rendering::Shape> shape = std::make_unique<rviz_rendering::Shape>(shapeType, scene_manager_, scene_node_);
 
         shape->setPosition(Ogre::Vector3(
                                 request->pose.position.x,
@@ -85,6 +86,16 @@ namespace add_objects_display
         shape.reset();
         RCLCPP_INFO(node_->get_logger(), "Removed object named: %s", request->name.c_str());
     }
+
+    rviz_rendering::Shape::Type getShapeType(const int& type) {
+        // Shape doesn't support Caspsule type, so it isn't listed here for now
+        if (type == curobo_msgs::srv::AddObject_Request::CUBOID) return rviz_rendering::Shape::Type::Cube;
+        if (type == curobo_msgs::srv::AddObject_Request::SPHERE) return rviz_rendering::Shape::Type::Sphere;
+        if (type == curobo_msgs::srv::AddObject_Request::CYLINDER) return rviz_rendering::Shape::Type::Cylinder;
+        if (type == curobo_msgs::srv::AddObject_Request::MESH) return rviz_rendering::Shape::Type::Mesh;
+        throw std::invalid_argument("Unknown shape type: " + type);
+    }
+
 
     // void AddObjectsDisplay::updateStyle(std::unique_ptr<rviz_rendering::Shape>& shape)
     // {
