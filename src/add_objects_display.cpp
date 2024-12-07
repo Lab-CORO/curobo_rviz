@@ -70,7 +70,7 @@ namespace add_objects_display
         RCLCPP_INFO(node_->get_logger(), "Added object %s", request.name.c_str());
     }
 
-    void AddObjectsDisplay::onRemoveUpdate(const std_msgs::msg::String request)
+    void AddObjectsDisplay::onRemoveUpdate(const std_msgs::msg::String & request)
     {
         auto it = shapeMap_.find(request.data.c_str());
         if (it == shapeMap_.end()) {
