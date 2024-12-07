@@ -26,8 +26,8 @@ namespace add_objects_display
 
     protected:
         void onInitialize() override;
-        void onAddUpdate(const curobo_msgs::msg::ObjectParameters & request);
-        void onRemoveUpdate(const std_msgs::msg::String & request);
+        void onAddUpdate(const curobo_msgs::msg::ObjectParameters & request) const;
+        void onRemoveUpdate(const std_msgs::msg::String & request) const;
         rviz_rendering::Shape::Type getShapeType(const int& type);
     
     private:
