@@ -26,8 +26,8 @@ namespace add_objects_display
 
     protected:
         void onInitialize() override;
-        void onAddUpdate(const curobo_msgs::srv::AddObject_Request::ConstSharedPtr request);
-        void onRemoveUpdate(const curobo_msgs::srv::RemoveObject_Request::ConstSharedPtr request);
+        void onAddUpdate(const curobo_msgs::msg::ObjectParameters & request);
+        void onRemoveUpdate(const std_msgs::msg::String & request);
         rviz_rendering::Shape::Type getShapeType(const int& type);
     
     private:

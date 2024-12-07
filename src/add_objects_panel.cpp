@@ -162,6 +162,7 @@ namespace add_objects_panel
                     auto msg = std_msgs::msg::String();
                     msg.data = name;
                     remove_object_publisher_->publish(msg);
+
                     // remove item from QListWidget
                     ui_->listWidgetObjects->removeItemWidget(selectedItems.at(i));
                     delete selectedItems.at(i);
@@ -181,25 +182,25 @@ namespace add_objects_panel
     void AddObjectsPanel::sendObjectParameters() {
         auto msg = curobo_msgs::msg::ObjectParameters();
 
-        msg->type = ui_->comboBoxObjects->currentData().toInt();
-        msg->name = ui_->lineEditName->displayText().toStdString();
-        msg->mesh_file_path = ui_->lineEditMeshPath->displayText().toStdString();
-        msg->pose.position.x = ui_->doubleSpinBoxPositionX->value();
-        msg->pose.position.y = ui_->doubleSpinBoxPositionY->value();
-        msg->pose.position.z = ui_->doubleSpinBoxPositionZ->value();
-        msg->pose.orientation.x = ui_->doubleSpinBoxOrientationX->value();
-        msg->pose.orientation.y = ui_->doubleSpinBoxOrientationY->value();
-        msg->pose.orientation.z = ui_->doubleSpinBoxOrientationZ->value();
-        msg->pose.orientation.w = ui_->doubleSpinBoxOrientationW->value();
-        msg->dimensions.x = ui_->doubleSpinBoxDimensionX->value();
-        msg->dimensions.y = ui_->doubleSpinBoxDimensionY->value();
-        msg->dimensions.z = ui_->doubleSpinBoxDimensionZ->value();
-        msg->color.r = ui_->doubleSpinBoxColorA->value();
-        msg->color.g = ui_->doubleSpinBoxColorG->value();
-        msg->color.b = ui_->doubleSpinBoxColorB->value();
-        msg->color.a = ui_->doubleSpinBoxColorA->value();
+        msg.type = ui_->comboBoxObjects->currentData().toInt();
+        msg.name = ui_->lineEditName->displayText().toStdString();
+        msg.mesh_file_path = ui_->lineEditMeshPath->displayText().toStdString();
+        msg.pose.position.x = ui_->doubleSpinBoxPositionX->value();
+        msg.pose.position.y = ui_->doubleSpinBoxPositionY->value();
+        msg.pose.position.z = ui_->doubleSpinBoxPositionZ->value();
+        msg.pose.orientation.x = ui_->doubleSpinBoxOrientationX->value();
+        msg.pose.orientation.y = ui_->doubleSpinBoxOrientationY->value();
+        msg.pose.orientation.z = ui_->doubleSpinBoxOrientationZ->value();
+        msg.pose.orientation.w = ui_->doubleSpinBoxOrientationW->value();
+        msg.dimensions.x = ui_->doubleSpinBoxDimensionX->value();
+        msg.dimensions.y = ui_->doubleSpinBoxDimensionY->value();
+        msg.dimensions.z = ui_->doubleSpinBoxDimensionZ->value();
+        msg.color.r = ui_->doubleSpinBoxColorA->value();
+        msg.color.g = ui_->doubleSpinBoxColorG->value();
+        msg.color.b = ui_->doubleSpinBoxColorB->value();
+        msg.color.a = ui_->doubleSpinBoxColorA->value();
 
-        add_object_publisher_->publish();
+        add_object_publisher_->publish(msg);
     }
 
     void AddObjectsPanel::displayMessage(std::string msg) {
