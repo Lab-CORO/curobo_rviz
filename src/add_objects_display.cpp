@@ -37,7 +37,7 @@ namespace add_objects_display
         RCLCPP_INFO(node_->get_logger(), "Initialized objects display");
     }
 
-    void AddObjectsDisplay::onAddUpdate(const curobo_msgs::msg::ObjectParameters & request) const
+    void AddObjectsDisplay::onAddUpdate(const curobo_msgs::msg::ObjectParameters & request)
     {
         Ogre::Vector3 position;
         Ogre::Quaternion orientation;
@@ -70,7 +70,7 @@ namespace add_objects_display
         RCLCPP_INFO(node_->get_logger(), "Added object %s", request.name.c_str());
     }
 
-    void AddObjectsDisplay::onRemoveUpdate(const std_msgs::msg::String request) const
+    void AddObjectsDisplay::onRemoveUpdate(const std_msgs::msg::String request)
     {
         auto it = shapeMap_.find(request.data.c_str());
         if (it == shapeMap_.end()) {
@@ -89,13 +89,13 @@ namespace add_objects_display
         RCLCPP_INFO(node_->get_logger(), "Removed object named: %s", request.data.c_str());
     }
 
-    rviz_rendering::Shape::Type AddObjectsDisplay::getShapeType(const int& type) const {
+    rviz_rendering::Shape::Type AddObjectsDisplay::getShapeType(const int& type) {
         // Shape doesn't support Caspsule type, so it isn't listed here for now
         if (type == curobo_msgs::srv::AddObject_Request::CUBOID) return rviz_rendering::Shape::Type::Cube;
         if (type == curobo_msgs::srv::AddObject_Request::SPHERE) return rviz_rendering::Shape::Type::Sphere;
         if (type == curobo_msgs::srv::AddObject_Request::CYLINDER) return rviz_rendering::Shape::Type::Cylinder;
         if (type == curobo_msgs::srv::AddObject_Request::MESH) return rviz_rendering::Shape::Type::Mesh;
-        throw std::invalid_argument("Unknown shape type: " + type);
+        throw std::invalid_argument("Unknown shape type: " + std::to_string(type));
     }
 } // add_objects_display
 
