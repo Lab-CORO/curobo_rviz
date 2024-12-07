@@ -73,18 +73,6 @@ namespace add_objects_panel
             return;
         }
 
-        RCLCPP_INFO(node_->get_logger(), "Sending following message to service:\n"
-                                            "\ttype: %d\tname: %s\n"
-                                            "\tmesh_file_path: %s\n"
-                                            "\tpose: {position: %f, %f, %f}{orientation: %f, %f, %f, %f}\n"
-                                            "\tdimensions: %f, %f, %f\n"
-                                            "\tcolor: %f, %f, %f, %f",
-                                            type, name.c_str(),
-                                            mesh_file_path.c_str(),
-                                            posX, posY, posZ, orientationX, orientationY, orientationZ, orientationW,
-                                            dimX, dimY, dimZ,
-                                            colorR, colorG, colorB, colorA);
-
         // setup request for service
         add_object_request_->type = type;
         add_object_request_->name = name;
@@ -103,6 +91,29 @@ namespace add_objects_panel
         add_object_request_->color.g = ui_->doubleSpinBoxColorG->value();
         add_object_request_->color.b = ui_->doubleSpinBoxColorB->value();
         add_object_request_->color.a = ui_->doubleSpinBoxColorA->value();
+
+        RCLCPP_INFO(node_->get_logger(), "Sending following message to service:\n"
+                                            "\ttype: %d\tname: %s\n"
+                                            "\tmesh_file_path: %s\n"
+                                            "\tpose: {position: %f, %f, %f}{orientation: %f, %f, %f, %f}\n"
+                                            "\tdimensions: %f, %f, %f\n"
+                                            "\tcolor: %f, %f, %f, %f",
+                                            type, name.c_str(),
+                                            mesh_file_path.c_str(),
+                                            add_object_request_->pose.position.x,
+                                            add_object_request_->pose.position.y,
+                                            add_object_request_->pose.position.z,
+                                            add_object_request_->pose.orientation.x,
+                                            add_object_request_->pose.orientation.y,
+                                            add_object_request_->pose.orientation.z,
+                                            add_object_request_->pose.orientation.w,
+                                            add_object_request_->dimensions.x,
+                                            add_object_request_->dimensions.y,
+                                            add_object_request_->dimensions.z,
+                                            add_object_request_->color.r,
+                                            add_object_request_->color.g, 
+                                            dd_object_request_->color.b,
+                                            add_object_request_->color.a);
 
         // call Add Objects with parameters
         auto future = add_object_client_->async_send_request(add_object_request_);
