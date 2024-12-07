@@ -42,7 +42,7 @@ namespace curobo_rviz
     void on_confirmPushButton_clicked();
 
   private:
-    std::unique_ptr<Ui::gui> ui_;
+    std::unique_ptr<Ui::gui_parameters> ui_;
     rclcpp::Node::SharedPtr node_;
     rclcpp::SyncParametersClient::SharedPtr param_client_;
     rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr motion_gen_config_client_;
