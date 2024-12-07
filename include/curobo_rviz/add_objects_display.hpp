@@ -30,8 +30,8 @@ namespace add_objects_display
     
     private:
         rclcpp::Node::SharedPtr node_;
-        rclcpp::Subscription<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_subscriber_;
-        rclcpp::Subscription<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_subscriber_;
+        rclcpp::Subscription<curobo_msgs::msg::ObjectParameters>::SharedPtr add_object_subscriber_;
+        rclcpp::Subscription<std_msgs::msg::String>::SharedPtr remove_object_subscriber_;
         std::unordered_map<std::string, std::unique_ptr<rviz_rendering::Shape>> shapeMap_;
     };
 } // namespace add_objects_display

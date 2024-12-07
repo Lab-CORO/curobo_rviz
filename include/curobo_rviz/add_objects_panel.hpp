@@ -4,6 +4,7 @@
 #include <rviz_common/panel.hpp>
 #include <curobo_msgs/srv/add_object.hpp>
 #include <curobo_msgs/srv/remove_object.hpp>
+#include <curobo_msgs/msg/object_parameters.hpp>
 #include <QtWidgets>
 
 #include <ui_add_object_panel.h>
@@ -31,8 +32,10 @@ namespace add_objects_panel
         std::shared_ptr<curobo_msgs::srv::AddObject_Request> add_object_request_;
         rclcpp::Client<curobo_msgs::srv::RemoveObject>::SharedPtr remove_object_client_;
         std::shared_ptr<curobo_msgs::srv::RemoveObject_Request> remove_object_request_;
-        rclcpp::Publisher<curobo_msgs::srv::AddObject_Request>::SharedPtr add_object_publisher_;
-        rclcpp::Publisher<curobo_msgs::srv::RemoveObject_Request>::SharedPtr remove_object_publisher_;
+        rclcpp::Publisher<curobo_msgs::msg::ObjectParameters>::SharedPtr add_object_publisher_;
+        rclcpp::Publisher<std_msgs::msg::String>::SharedPtr remove_object_publisher_;
         QTimer *timerMessage_;
+
+        void sendObjectParameters();
     };
 }

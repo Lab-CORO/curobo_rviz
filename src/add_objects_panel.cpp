@@ -29,8 +29,8 @@ namespace add_objects_panel
         remove_object_request_ = std::make_shared<curobo_msgs::srv::RemoveObject_Request>();
 
         // create publisher so Display can retrieve the parameters to add objects and remove them
-        add_object_publisher_ = node_->create_publisher<curobo_msgs::srv::AddObject_Request>("add_objects_topic", 10);
-        remove_object_publisher_ = node_->create_publisher<curobo_msgs::srv::RemoveObject_Request>("remove_objects_topic", 10);
+        add_object_publisher_ = node_->create_publisher<curobo_msgs::msg::ObjectParameters>("add_objects_topic", 10);
+        remove_object_publisher_ = node_->create_publisher<std_msgs::msg::String>("remove_objects_topic", 10);
 
         // associate types to the service constants
         ui_->comboBoxObjects->addItem("Cube", QVariant(curobo_msgs::srv::AddObject_Request::CUBOID));
@@ -73,7 +73,7 @@ namespace add_objects_panel
         double colorA = ui_->doubleSpinBoxColorA->value();
         int type = ui_->comboBoxObjects->currentData().toInt();
         std::string name = ui_->lineEditName->displayText().toStdString();
-        std::string mesh_file_path = "";
+        std::string mesh_file_path = ui_->lineEditMeshPath->displayText().toStdString();
 
         // if name is not unique -> checked by the service
         if (name.empty()) {
@@ -126,7 +126,7 @@ namespace add_objects_panel
                 RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
 
                 // call Display service to add the object on the screen
-                add_object_publisher_->publish(*add_object_request_);
+                sendObjectParameters();
 
                 // add item to QListWidget
                 QString objectDisplayText = QString("%1 {pos: %2, %3, %4}{ori: %5, %6, %7, %8}")
@@ -134,7 +134,7 @@ namespace add_objects_panel
                                                     .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW);
                 QListWidgetItem* objectItem = new QListWidgetItem(objectDisplayText);
                 objectItem->setData(Qt::UserRole, QVariant(QString::fromStdString(name))); // store name as data for the remove service
-                ui_->listWidgetObjects->addItem(objectItem);           
+                ui_->listWidgetObjects->addItem(objectItem);
             } else {
                 RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
             }
@@ -159,7 +159,9 @@ namespace add_objects_panel
                 
                 if (result->success) {
                     // call Display service to remove the object from screen
-                    remove_object_publisher_->publish(*remove_object_request_);
+                    auto msg = std_msgs::msg::String();
+                    msg.data = name;
+                    remove_object_publisher_->publish(msg);
                     // remove item from QListWidget
                     ui_->listWidgetObjects->removeItemWidget(selectedItems.at(i));
                     delete selectedItems.at(i);
@@ -174,6 +176,30 @@ namespace add_objects_panel
                 RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
             }
         }
+    }
+
+    void AddObjectsPanel::sendObjectParameters() {
+        auto msg = curobo_msgs::msg::ObjectParameters();
+
+        msg->type = ui_->comboBoxObjects->currentData().toInt();
+        msg->name = ui_->lineEditName->displayText().toStdString();
+        msg->mesh_file_path = ui_->lineEditMeshPath->displayText().toStdString();
+        msg->pose.position.x = ui_->doubleSpinBoxPositionX->value();
+        msg->pose.position.y = ui_->doubleSpinBoxPositionY->value();
+        msg->pose.position.z = ui_->doubleSpinBoxPositionZ->value();
+        msg->pose.orientation.x = ui_->doubleSpinBoxOrientationX->value();
+        msg->pose.orientation.y = ui_->doubleSpinBoxOrientationY->value();
+        msg->pose.orientation.z = ui_->doubleSpinBoxOrientationZ->value();
+        msg->pose.orientation.w = ui_->doubleSpinBoxOrientationW->value();
+        msg->dimensions.x = ui_->doubleSpinBoxDimensionX->value();
+        msg->dimensions.y = ui_->doubleSpinBoxDimensionY->value();
+        msg->dimensions.z = ui_->doubleSpinBoxDimensionZ->value();
+        msg->color.r = ui_->doubleSpinBoxColorA->value();
+        msg->color.g = ui_->doubleSpinBoxColorG->value();
+        msg->color.b = ui_->doubleSpinBoxColorB->value();
+        msg->color.a = ui_->doubleSpinBoxColorA->value();
+
+        add_object_publisher_->publish();
     }
 
     void AddObjectsPanel::displayMessage(std::string msg) {
