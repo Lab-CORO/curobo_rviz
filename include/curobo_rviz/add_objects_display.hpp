@@ -28,7 +28,7 @@ namespace add_objects_display
         void onInitialize() override;
         void onAddUpdate(const curobo_msgs::msg::ObjectParameters & request) const;
         void onRemoveUpdate(const std_msgs::msg::String & request) const;
-        rviz_rendering::Shape::Type getShapeType(const int& type);
+        rviz_rendering::Shape::Type getShapeType(const int& type) const;
     
     private:
         rclcpp::Node::SharedPtr node_;

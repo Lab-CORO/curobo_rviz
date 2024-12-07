@@ -89,7 +89,7 @@ namespace add_objects_display
         RCLCPP_INFO(node_->get_logger(), "Removed object named: %s", request.data.c_str());
     }
 
-    rviz_rendering::Shape::Type AddObjectsDisplay::getShapeType(const int& type) {
+    rviz_rendering::Shape::Type AddObjectsDisplay::getShapeType(const int& type) const {
         // Shape doesn't support Caspsule type, so it isn't listed here for now
         if (type == curobo_msgs::srv::AddObject_Request::CUBOID) return rviz_rendering::Shape::Type::Cube;
         if (type == curobo_msgs::srv::AddObject_Request::SPHERE) return rviz_rendering::Shape::Type::Sphere;
