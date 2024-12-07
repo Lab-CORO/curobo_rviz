@@ -23,16 +23,22 @@ set(CMAKE_AUTOMOC ON)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(rviz_common REQUIRED)
+find_package(curobo_msgs REQUIRED)
 
 set(dependencies_pkgs
   rclcpp
   rcl_interfaces
   std_msgs
   std_srvs
+  curobo_msgs
   rviz_common
   Qt5Core
   Qt5Gui
   Qt5Widgets
+  curobo_msgs
+  geometry_msgs
 )
 
 foreach(pkg IN LISTS dependencies_pkgs)
@@ -45,17 +51,22 @@ set(library_name curobo_rviz)
 
 # Define source file
 set(${PROJECT_NAME}_SRCS
+  src/add_objects_display.cpp
+  src/add_objects_panel.cpp
   src/curobo_rviz.cpp
 )
 
 # Define header file
 set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/curobo_rviz.hpp
+  include/${PROJECT_NAME}/add_objects_display.hpp
+  include/${PROJECT_NAME}/add_objects_panel.hpp
 )
 
 # Define ui file
 set(${PROJECT_NAME}_UIS
   resource/curobo_rviz_panel.ui
+  resource/add_object_panel.ui
 )
 
 # Generate header for ui
@@ -67,8 +78,8 @@ add_library(${library_name} SHARED
   ${${PROJECT_NAME}_UIS_H}
   ${${PROJECT_NAME}_MOCS} 
 )
+target_link_libraries(${library_name} Qt5::Widgets rviz_common::rviz_common)
 ament_target_dependencies(${library_name} ${dependencies_pkgs})
-target_link_libraries(${library_name} rviz_common::rviz_common)
 
 # I prefer the Qt signals and slots to avoid defining "emit", "slots",
 # etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here
