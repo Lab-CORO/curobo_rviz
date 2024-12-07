@@ -129,8 +129,14 @@ namespace add_objects_panel
                 // Add item to QListWidget:
                     // setup display text in the QListWidget
                 QString objectDisplayText = QString("%1 {pos: %2, %3, %4}{ori: %5, %6, %7, %8}")
-                                                    .arg(name.c_str()).arg(posX).arg(posY).arg(posZ)
-                                                    .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW);
+                                                    .arg(name.c_str())
+                                                    .arg(add_object_request_->pose.position.x)
+                                                    .arg(add_object_request_->pose.position.y)
+                                                    .arg(add_object_request_->pose.position.z)
+                                                    .arg(add_object_request_->pose.orientation.x)
+                                                    .arg(add_object_request_->pose.orientation.y)
+                                                    .arg(add_object_request_->pose.orientation.z)
+                                                    .arg(add_object_request_->pose.orientation.w);
                 QListWidgetItem* objectItem = new QListWidgetItem(objectDisplayText);
                     // store name as data for the remove service so it's easier to handle
                 objectItem->setData(Qt::UserRole, QVariant(QString::fromStdString(name)));
