@@ -76,7 +76,7 @@ namespace add_objects_panel
         // setup request for service
         add_object_request_->type = type;
         add_object_request_->name = name;
-        add_object_request_->mesh_file_path = mesh_file_path
+        add_object_request_->mesh_file_path = mesh_file_path;
         add_object_request_->pose.position.x = ui_->doubleSpinBoxPositionX->value();
         add_object_request_->pose.position.y = ui_->doubleSpinBoxPositionY->value();
         add_object_request_->pose.position.z = ui_->doubleSpinBoxPositionZ->value();
