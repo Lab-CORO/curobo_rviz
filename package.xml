@@ -2,9 +2,9 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>curobo_rviz</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>
-    Curobo rviz panel to modify parameters.
+    Curobo rviz panels to modify parameters or add objects to the environment.
   </description>
   <maintainer email="will@todo.todo">will</maintainer>
   <license>Apache-2</license>
@@ -15,6 +15,10 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>rviz_common</depend>
+  <depend>pluginlib</depend>
+  <depend>curobo_msgs</depend>
+  <depend>rviz_rendering</depend>
+  <depend>geometry_msgs</depend>
 
   <exec_depend>libqt5-core</exec_depend>
   <exec_depend>libqt5-gui</exec_depend>
