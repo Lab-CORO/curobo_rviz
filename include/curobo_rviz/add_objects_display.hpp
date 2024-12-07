@@ -10,6 +10,8 @@
 #include <rviz_rendering/objects/shape.hpp>
 #include <curobo_msgs/srv/add_object.hpp>
 #include <curobo_msgs/srv/remove_object.hpp>
+#include <curobo_msgs/msg/object_parameters.hpp>
+#include "std_msgs/msg/string.hpp"
 #include <QtWidgets>
 
 namespace add_objects_display
