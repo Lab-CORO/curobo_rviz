@@ -112,7 +112,7 @@ namespace add_objects_panel
                                             add_object_request_->dimensions.z,
                                             add_object_request_->color.r,
                                             add_object_request_->color.g, 
-                                            dd_object_request_->color.b,
+                                            add_object_request_->color.b,
                                             add_object_request_->color.a);
 
         // call Add Objects with parameters
