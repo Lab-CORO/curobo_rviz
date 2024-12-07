@@ -56,21 +56,7 @@ namespace add_objects_panel
 
     void AddObjectsPanel::on_pushButtonAdd_clicked()
     {
-        // retrieve values on the UI
-        double posX = ui_->doubleSpinBoxPositionX->value();
-        double posY = ui_->doubleSpinBoxPositionY->value();
-        double posZ = ui_->doubleSpinBoxPositionZ->value();
-        double orientationX = ui_->doubleSpinBoxOrientationX->value();
-        double orientationY = ui_->doubleSpinBoxOrientationY->value();
-        double orientationZ = ui_->doubleSpinBoxOrientationZ->value();
-        double orientationW = ui_->doubleSpinBoxOrientationW->value();
-        double dimX = ui_->doubleSpinBoxDimensionX->value();
-        double dimY = ui_->doubleSpinBoxDimensionY->value();
-        double dimZ = ui_->doubleSpinBoxDimensionZ->value();
-        double colorR = ui_->doubleSpinBoxColorA->value();
-        double colorG = ui_->doubleSpinBoxColorG->value();
-        double colorB = ui_->doubleSpinBoxColorB->value();
-        double colorA = ui_->doubleSpinBoxColorA->value();
+        // retrieve values on the UI for some checkups
         int type = ui_->comboBoxObjects->currentData().toInt();
         std::string name = ui_->lineEditName->displayText().toStdString();
         std::string mesh_file_path = ui_->lineEditMeshPath->displayText().toStdString();
@@ -99,46 +85,53 @@ namespace add_objects_panel
                                             dimX, dimY, dimZ,
                                             colorR, colorG, colorB, colorA);
 
-        // setup request
-        // auto add_object_request_ = curobo_msgs::srv::AddObject_Request();
+        // setup request for service
         add_object_request_->type = type;
         add_object_request_->name = name;
-        add_object_request_->pose.position.x = posX;
-        add_object_request_->pose.position.y = posY;
-        add_object_request_->pose.position.z = posZ;
-        add_object_request_->pose.orientation.x = orientationX;
-        add_object_request_->pose.orientation.y = orientationY;
-        add_object_request_->pose.orientation.z = orientationZ;
-        add_object_request_->pose.orientation.w = orientationW;
-        add_object_request_->dimensions.x = dimX;
-        add_object_request_->dimensions.y = dimY;
-        add_object_request_->dimensions.z = dimZ;
-        add_object_request_->color.r = colorR;
-        add_object_request_->color.g = colorG;
-        add_object_request_->color.b = colorB;
-        add_object_request_->color.a = colorA;
+        add_object_request_->mesh_file_path = mesh_file_path
+        add_object_request_->pose.position.x = ui_->doubleSpinBoxPositionX->value();
+        add_object_request_->pose.position.y = ui_->doubleSpinBoxPositionY->value();
+        add_object_request_->pose.position.z = ui_->doubleSpinBoxPositionZ->value();
+        add_object_request_->pose.orientation.x = ui_->doubleSpinBoxOrientationX->value();
+        add_object_request_->pose.orientation.y = ui_->doubleSpinBoxOrientationY->value();
+        add_object_request_->pose.orientation.z = ui_->doubleSpinBoxOrientationZ->value();
+        add_object_request_->pose.orientation.w = ui_->doubleSpinBoxOrientationW->value();
+        add_object_request_->dimensions.x = ui_->doubleSpinBoxDimensionX->value();
+        add_object_request_->dimensions.y = ui_->doubleSpinBoxDimensionY->value();
+        add_object_request_->dimensions.z = ui_->doubleSpinBoxDimensionZ->value();
+        add_object_request_->color.r = ui_->doubleSpinBoxColorA->value();
+        add_object_request_->color.g = ui_->doubleSpinBoxColorG->value();
+        add_object_request_->color.b = ui_->doubleSpinBoxColorB->value();
+        add_object_request_->color.a = ui_->doubleSpinBoxColorA->value();
 
         // call Add Objects with parameters
         auto future = add_object_client_->async_send_request(add_object_request_);
         if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
             auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
+
             if (result->success) {
                 RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
 
                 // call Display service to add the object on the screen
                 sendObjectParameters();
 
-                // add item to QListWidget
+                // Add item to QListWidget:
+                    // setup display text in the QListWidget
                 QString objectDisplayText = QString("%1 {pos: %2, %3, %4}{ori: %5, %6, %7, %8}")
                                                     .arg(name.c_str()).arg(posX).arg(posY).arg(posZ)
                                                     .arg(orientationX).arg(orientationY).arg(orientationZ).arg(orientationW);
                 QListWidgetItem* objectItem = new QListWidgetItem(objectDisplayText);
-                objectItem->setData(Qt::UserRole, QVariant(QString::fromStdString(name))); // store name as data for the remove service
+                    // store name as data for the remove service so it's easier to handle
+                objectItem->setData(Qt::UserRole, QVariant(QString::fromStdString(name)));
+                    // add the item
                 ui_->listWidgetObjects->addItem(objectItem);
+
             } else {
                 RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
             }
+
             displayMessage(result->message);
+
         } else {
             RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
         }
@@ -146,12 +139,16 @@ namespace add_objects_panel
 
     void AddObjectsPanel::on_pushButtonRemove_clicked()
     {
+        // only way to check if an object is selected is with selectedItems
         QList<QListWidgetItem *> selectedItems = ui_->listWidgetObjects->selectedItems();
 
         for (int i = 0; i < selectedItems.size(); i++) {
-
+            
+            // find the selected object
             std::string name = selectedItems.at(i)->data(Qt::UserRole).toString().toStdString();
             remove_object_request_->name = name;
+
+            // send the request to the service to remove the object
             auto future = remove_object_client_->async_send_request(remove_object_request_);
 
             if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
@@ -170,9 +167,12 @@ namespace add_objects_panel
                     RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
 
                 } else {
+
                     RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
                 }
+
                 displayMessage(result->message);
+
             } else {
                 RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
             }
@@ -180,6 +180,7 @@ namespace add_objects_panel
     }
 
     void AddObjectsPanel::sendObjectParameters() {
+        // setup request
         auto msg = curobo_msgs::msg::ObjectParameters();
 
         msg.type = ui_->comboBoxObjects->currentData().toInt();
@@ -200,6 +201,7 @@ namespace add_objects_panel
         msg.color.b = ui_->doubleSpinBoxColorB->value();
         msg.color.a = ui_->doubleSpinBoxColorA->value();
 
+        // send request
         add_object_publisher_->publish(msg);
     }
 
