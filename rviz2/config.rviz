@@ -28,9 +28,8 @@ Panels:
     SyncSource: ""
   - Class: curobo_rviz/RvizArgsPanel
     Name: RvizArgsPanel
-    PushButton:
-      count_button_1: 0
-      count_button_2: 0
+  - Class: add_objects_panel/AddObjectsPanel
+    Name: AddObjectsPanel
 Visualization Manager:
   Class: ""
   Displays:
