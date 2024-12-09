@@ -10,13 +10,13 @@
           type="add_objects_panel::AddObjectsPanel"
           base_class_type="rviz_common::Panel">
       <description>Add Objects Panel</description>
+      <message_type>curobo_msgs/msg/ObjectParameters</message_type>
   </class>
 
   <class name="add_objects_display/AddObjectsDisplay"
         type="add_objects_display::AddObjectsDisplay"
         base_class_type="rviz_common::Display">
     <description>Add Objects Display</description>
-    <message_type>curobo_msgs/srv/AddObject_Request</message_type>
   </class>
   
 </library>
