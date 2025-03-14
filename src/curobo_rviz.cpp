@@ -24,9 +24,7 @@ namespace curobo_rviz
         {"--ros-args", "--remap", "__node:=rviz_updata_parameters_node", "--"});
     node_ = std::make_shared<rclcpp::Node>("_", options);
     param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "curobo_gen_traj");
-    while (!param_client_->wait_for_service(std::chrono::seconds(3))) {
-      RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
-    }
+
     // create Trigger service update_motion_gen_config
     motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/update_motion_gen_config");
     motion_gen_config_request_ = std::make_shared<std_srvs::srv::Trigger::Request>();
@@ -49,15 +47,12 @@ namespace curobo_rviz
     void RvizArgsPanel::load(const rviz_common::Config &config)
     {
       Panel::load(config);
-      auto parameters = param_client_->get_parameters({"max_attempts", "timeout", "time_dilation_factor", "voxel_size", "collision_activation_distance"});
-      RCLCPP_INFO(node_->get_logger(), "Parameters received: %ld", parameters.size());
-
       // set initial values in UI to the values from the parameter server
-      ui_->spinBoxMaxAttempts->setValue(parameters[0].as_int());
-      ui_->doubleSpinBoxTimeout->setValue(parameters[1].as_double());
-      ui_->doubleSpinBoxTimeDilationFactor->setValue(parameters[2].as_double());
-      ui_->doubleSpinBoxVoxelSize->setValue(parameters[3].as_double());
-      ui_->doubleSpinBoxCollisionActivationDistance->setValue(parameters[4].as_double());
+      ui_->spinBoxMaxAttempts->setValue(this->node_->get_parameter("max_attempts").as_int());
+      ui_->doubleSpinBoxTimeout->setValue(this->node_->get_parameter("timeout").as_double());
+      ui_->doubleSpinBoxTimeDilationFactor->setValue(this->node_->get_parameter("time_dilation_factor").as_double());
+      ui_->doubleSpinBoxVoxelSize->setValue(this->node_->get_parameter("voxel_size").as_double());
+      ui_->doubleSpinBoxCollisionActivationDistance->setValue(this->node_->get_parameter("collision_activation_distance").as_double());
     }
 
     void RvizArgsPanel::save(rviz_common::Config config) const
