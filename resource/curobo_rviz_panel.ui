@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>466</width>
-    <height>178</height>
+    <height>327</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>10</y>
-     <width>461</width>
-     <height>161</height>
+     <y>30</y>
+     <width>454</width>
+     <height>204</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
@@ -41,13 +41,33 @@
     <property name="verticalSpacing">
      <number>6</number>
     </property>
-    <item row="3" column="1">
-     <widget class="QDoubleSpinBox" name="doubleSpinBoxTimeDilationFactor">
-      <property name="maximum">
-       <double>1.000000000000000</double>
+    <item row="1" column="4">
+     <widget class="QLabel" name="labelVoxelSize">
+      <property name="text">
+       <string>Voxel size</string>
       </property>
-      <property name="singleStep">
-       <double>0.100000000000000</double>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="4">
+     <widget class="QPushButton" name="generateAndSend">
+      <property name="text">
+       <string>Generate and send</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QSpinBox" name="spinBoxMaxAttempts">
+      <property name="maximum">
+       <number>10</number>
       </property>
      </widget>
     </item>
@@ -61,6 +81,49 @@
       </property>
       <property name="singleStep">
        <double>0.025000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
+     <widget class="QLabel" name="labelUpdateOnChange">
+      <property name="font">
+       <font>
+        <underline>true</underline>
+        <strikeout>false</strikeout>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="text">
+       <string>Update on change</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5">
+     <widget class="QDoubleSpinBox" name="doubleSpinBoxVoxelSize">
+      <property name="maximum">
+       <double>50.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.020000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="labelTimeout">
+      <property name="text">
+       <string>Timeout</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="margin">
+       <number>0</number>
       </property>
      </widget>
     </item>
@@ -83,29 +146,10 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="4" colspan="2">
-     <widget class="QPushButton" name="confirmPushButton">
+    <item row="7" column="0">
+     <widget class="QPushButton" name="sendTrajectory">
       <property name="text">
-       <string>Confirm Changes</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="4">
-     <widget class="QLabel" name="labelCollisionActivationDistance">
-      <property name="text">
-       <string>Collision activation distance</string>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="margin">
-       <number>0</number>
+       <string>Send Trajectory</string>
       </property>
      </widget>
     </item>
@@ -139,13 +183,72 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="5">
-     <widget class="QDoubleSpinBox" name="doubleSpinBoxVoxelSize">
+    <item row="3" column="1">
+     <widget class="QDoubleSpinBox" name="doubleSpinBoxTimeDilationFactor">
       <property name="maximum">
-       <double>50.000000000000000</double>
+       <double>1.000000000000000</double>
       </property>
       <property name="singleStep">
-       <double>0.020000000000000</double>
+       <double>0.100000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4" colspan="2">
+     <widget class="QLabel" name="labelConfirmChangesMessage">
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QPushButton" name="generateTrajectory">
+      <property name="text">
+       <string>Generate Trajectory</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QDoubleSpinBox" name="doubleSpinBoxTimeout">
+      <property name="maximum">
+       <double>60.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.500000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="4" colspan="2">
+     <widget class="QPushButton" name="confirmPushButton">
+      <property name="text">
+       <string>Confirm Changes</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLabel" name="labelCollisionActivationDistance">
+      <property name="text">
+       <string>Collision activation distance</string>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="margin">
+       <number>0</number>
       </property>
      </widget>
     </item>
@@ -168,89 +271,15 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0" colspan="2">
-     <widget class="QLabel" name="labelUpdateOnChange">
-      <property name="font">
-       <font>
-        <underline>true</underline>
-        <strikeout>false</strikeout>
-        <kerning>true</kerning>
-       </font>
-      </property>
+    <item row="7" column="4">
+     <widget class="QPushButton" name="stopRobot">
       <property name="text">
-       <string>Update on change</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <string>Stop robot</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QSpinBox" name="spinBoxMaxAttempts">
-      <property name="maximum">
-       <number>10</number>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="4">
-     <widget class="QLabel" name="labelVoxelSize">
-      <property name="text">
-       <string>Voxel size</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="labelTimeout">
-      <property name="text">
-       <string>Timeout</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QDoubleSpinBox" name="doubleSpinBoxTimeout">
-      <property name="maximum">
-       <double>60.000000000000000</double>
-      </property>
-      <property name="singleStep">
-       <double>0.500000000000000</double>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="4" colspan="2">
-     <widget class="QLabel" name="labelConfirmChangesMessage">
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    </layout>
-    </widget>
+   </layout>
+  </widget>
  </widget>
  <resources/>
  <connections/>

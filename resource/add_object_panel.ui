@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
+    <width>465</width>
     <height>327</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
   <widget class="QLabel" name="labelName">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>49</x>
      <y>9</y>
      <width>41</width>
      <height>17</height>
@@ -29,7 +29,7 @@
   <widget class="QLineEdit" name="lineEditName">
    <property name="geometry">
     <rect>
-     <x>95</x>
+     <x>135</x>
      <y>9</y>
      <width>281</width>
      <height>25</height>
@@ -39,7 +39,7 @@
   <widget class="QLabel" name="labelType">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>49</x>
      <y>40</y>
      <width>33</width>
      <height>17</height>
@@ -52,7 +52,7 @@
   <widget class="QLineEdit" name="lineEditMeshPath">
    <property name="geometry">
     <rect>
-     <x>237</x>
+     <x>277</x>
      <y>40</y>
      <width>137</width>
      <height>25</height>
@@ -65,7 +65,7 @@
   <widget class="QLabel" name="labelPosition">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>49</x>
      <y>71</y>
      <width>56</width>
      <height>17</height>
@@ -78,7 +78,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionX">
    <property name="geometry">
     <rect>
-     <x>95</x>
+     <x>135</x>
      <y>71</y>
      <width>65</width>
      <height>26</height>
@@ -97,7 +97,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionY">
    <property name="geometry">
     <rect>
-     <x>166</x>
+     <x>206</x>
      <y>71</y>
      <width>65</width>
      <height>26</height>
@@ -116,7 +116,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxPositionZ">
    <property name="geometry">
     <rect>
-     <x>237</x>
+     <x>277</x>
      <y>71</y>
      <width>65</width>
      <height>26</height>
@@ -135,7 +135,7 @@
   <widget class="QLabel" name="labelOrientation">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>49</x>
      <y>103</y>
      <width>80</width>
      <height>17</height>
@@ -148,7 +148,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationX">
    <property name="geometry">
     <rect>
-     <x>95</x>
+     <x>135</x>
      <y>103</y>
      <width>65</width>
      <height>26</height>
@@ -161,7 +161,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationY">
    <property name="geometry">
     <rect>
-     <x>166</x>
+     <x>206</x>
      <y>103</y>
      <width>65</width>
      <height>26</height>
@@ -174,7 +174,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationZ">
    <property name="geometry">
     <rect>
-     <x>237</x>
+     <x>277</x>
      <y>103</y>
      <width>65</width>
      <height>26</height>
@@ -187,7 +187,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxOrientationW">
    <property name="geometry">
     <rect>
-     <x>308</x>
+     <x>348</x>
      <y>103</y>
      <width>65</width>
      <height>26</height>
@@ -203,7 +203,7 @@
   <widget class="QLabel" name="labelDimensions">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>49</x>
      <y>135</y>
      <width>79</width>
      <height>17</height>
@@ -216,7 +216,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionX">
    <property name="geometry">
     <rect>
-     <x>95</x>
+     <x>135</x>
      <y>135</y>
      <width>65</width>
      <height>26</height>
@@ -232,7 +232,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionY">
    <property name="geometry">
     <rect>
-     <x>166</x>
+     <x>206</x>
      <y>135</y>
      <width>65</width>
      <height>26</height>
@@ -248,7 +248,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxDimensionZ">
    <property name="geometry">
     <rect>
-     <x>237</x>
+     <x>277</x>
      <y>135</y>
      <width>65</width>
      <height>26</height>
@@ -264,7 +264,7 @@
   <widget class="QLabel" name="labelColor">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>49</x>
      <y>167</y>
      <width>37</width>
      <height>17</height>
@@ -277,7 +277,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxColorR">
    <property name="geometry">
     <rect>
-     <x>95</x>
+     <x>135</x>
      <y>167</y>
      <width>65</width>
      <height>26</height>
@@ -290,7 +290,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxColorG">
    <property name="geometry">
     <rect>
-     <x>166</x>
+     <x>206</x>
      <y>167</y>
      <width>65</width>
      <height>26</height>
@@ -303,7 +303,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxColorB">
    <property name="geometry">
     <rect>
-     <x>237</x>
+     <x>277</x>
      <y>167</y>
      <width>65</width>
      <height>26</height>
@@ -316,7 +316,7 @@
   <widget class="QDoubleSpinBox" name="doubleSpinBoxColorA">
    <property name="geometry">
     <rect>
-     <x>308</x>
+     <x>348</x>
      <y>167</y>
      <width>65</width>
      <height>26</height>
@@ -332,7 +332,7 @@
   <widget class="QListWidget" name="listWidgetObjects">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>49</x>
      <y>260</y>
      <width>365</width>
      <height>61</height>
@@ -342,7 +342,7 @@
   <widget class="QPushButton" name="pushButtonRemove">
    <property name="geometry">
     <rect>
-     <x>237</x>
+     <x>277</x>
      <y>199</y>
      <width>131</width>
      <height>25</height>
@@ -355,7 +355,7 @@
   <widget class="QComboBox" name="comboBoxObjects">
    <property name="geometry">
     <rect>
-     <x>95</x>
+     <x>135</x>
      <y>40</y>
      <width>131</width>
      <height>25</height>
@@ -365,7 +365,7 @@
   <widget class="QPushButton" name="pushButtonAdd">
    <property name="geometry">
     <rect>
-     <x>95</x>
+     <x>135</x>
      <y>199</y>
      <width>131</width>
      <height>25</height>
@@ -378,7 +378,7 @@
   <widget class="QLabel" name="labelMessage">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>50</x>
      <y>230</y>
      <width>361</width>
      <height>20</height>
