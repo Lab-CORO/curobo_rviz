@@ -14,7 +14,6 @@ namespace curobo_rviz
     , time_dilation_factor_{0.0}
     , voxel_size_{0.0}
     , collision_activation_distance_{0.0}
-    , timerConfirmChangesMessage_{nullptr}
   {
     // Extend the widget with all attributes and children from UI file
     ui_->setupUi(this);
@@ -25,7 +24,6 @@ namespace curobo_rviz
     node_ = std::make_shared<rclcpp::Node>("_", options);
     param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "curobo_gen_traj");
 
-    // create Trigger service update_motion_gen_config
     motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/update_motion_gen_config");
     motion_gen_config_request_ = std::make_shared<std_srvs::srv::Trigger::Request>();
 
@@ -36,9 +34,28 @@ namespace curobo_rviz
     connect(ui_->doubleSpinBoxVoxelSize, SIGNAL(valueChanged(double)), this, SLOT(updateVoxelSize(double)));
     connect(ui_->doubleSpinBoxCollisionActivationDistance, SIGNAL(valueChanged(double)), this, SLOT(updateCollisionActivationDistance(double)));
     
-    // create a timer to show labelConfirmChangesMessage for 5 seconds
-    timerConfirmChangesMessage_ = new QTimer(this);
-    connect(timerConfirmChangesMessage_, SIGNAL(timeout()), ui_->labelConfirmChangesMessage, SLOT(clear()));
+    QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this]() {
+        // Replace this condition with your actual check
+        if(param_client_->wait_for_service(std::chrono::milliseconds(10))){
+            auto conditionMet = param_client_->get_parameters({"node_is_available"});
+            // Enable or disable the widget based on the condition
+            ui_->spinBoxMaxAttempts->setEnabled(conditionMet[0].as_bool());
+            ui_->doubleSpinBoxTimeout->setEnabled(conditionMet[0].as_bool());
+            ui_->doubleSpinBoxTimeDilationFactor->setEnabled(conditionMet[0].as_bool());
+            ui_->doubleSpinBoxVoxelSize->setEnabled(conditionMet[0].as_bool());
+            ui_->doubleSpinBoxCollisionActivationDistance->setEnabled(conditionMet[0].as_bool());
+            ui_->confirmPushButton->setEnabled(conditionMet[0].as_bool());
+        }else{
+            ui_->spinBoxMaxAttempts->setEnabled(false);
+            ui_->doubleSpinBoxTimeout->setEnabled(false);
+            ui_->doubleSpinBoxTimeDilationFactor->setEnabled(false);
+            ui_->doubleSpinBoxVoxelSize->setEnabled(false);
+            ui_->doubleSpinBoxCollisionActivationDistance->setEnabled(false);
+            ui_->confirmPushButton->setEnabled(false);
+        }
+    });
+    timer->start(100); // checks every 1000 milliseconds (1 second)
   }
 
   RvizArgsPanel::~RvizArgsPanel()
@@ -48,6 +65,7 @@ namespace curobo_rviz
     {
       Panel::load(config);
       // set initial values in UI to the values from the parameter server
+      
       ui_->spinBoxMaxAttempts->setValue(this->node_->get_parameter("max_attempts").as_int());
       ui_->doubleSpinBoxTimeout->setValue(this->node_->get_parameter("timeout").as_double());
       ui_->doubleSpinBoxTimeDilationFactor->setValue(this->node_->get_parameter("time_dilation_factor").as_double());
@@ -68,9 +86,6 @@ namespace curobo_rviz
     void RvizArgsPanel::updateMaxAttempts(int value)
     {
         max_attempts_ = value;
-        while (!param_client_->wait_for_service(std::chrono::seconds(1))) {
-            RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
-        }
         
         // set parameters on parameter server
         param_client_->set_parameters_atomically({rclcpp::Parameter("max_attempts", max_attempts_)});
@@ -80,9 +95,6 @@ namespace curobo_rviz
     void RvizArgsPanel::updateTimeout(double value)
     {
         timeout_ = value;
-        while (!param_client_->wait_for_service(std::chrono::seconds(1))) {
-            RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
-        }
         
         // set parameters on parameter server
         param_client_->set_parameters_atomically({rclcpp::Parameter("timeout", timeout_)});
@@ -92,10 +104,7 @@ namespace curobo_rviz
     void RvizArgsPanel::updateTimeDilationFactor(double value)
     {
         time_dilation_factor_ = value;
-        while (!param_client_->wait_for_service(std::chrono::seconds(1))) {
-            RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
-        }
-        
+       
         // set parameters on parameter server
         param_client_->set_parameters_atomically({rclcpp::Parameter("time_dilation_factor", time_dilation_factor_)});
         RCLCPP_INFO(node_->get_logger(), "Time dilation factor set to %.2f", time_dilation_factor_);
@@ -115,9 +124,20 @@ namespace curobo_rviz
 
     void RvizArgsPanel::on_confirmPushButton_clicked()
     {
+        if (!ui_->confirmPushButton->isEnabled()) {
+            return;
+          }
+        // Set ui to disable
+        ui_->spinBoxMaxAttempts->setEnabled(false);
+        ui_->doubleSpinBoxTimeout->setEnabled(false);
+        ui_->doubleSpinBoxTimeDilationFactor->setEnabled(false);
+        ui_->doubleSpinBoxVoxelSize->setEnabled(false);
+        ui_->doubleSpinBoxCollisionActivationDistance->setEnabled(false);
+        ui_->confirmPushButton->setEnabled(false);
         RCLCPP_INFO(node_->get_logger(), "Confirm button clicked.");
-        while (!param_client_->wait_for_service(std::chrono::seconds(3))) {
-            RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
+        if (!param_client_->wait_for_service(std::chrono::seconds(3))) {
+            RCLCPP_INFO(node_->get_logger(), "service not available");
+            return;
         }
         
         // set parameters on parameter server
@@ -126,27 +146,25 @@ namespace curobo_rviz
         RCLCPP_INFO(node_->get_logger(), "Parameters set:\voxel_size: %.2f, collision_activation_distance: %.2f", voxel_size_, collision_activation_distance_);
         
 
-        while (!motion_gen_config_client_->wait_for_service(std::chrono::seconds(1))) {
-            RCLCPP_INFO(node_->get_logger(), "service not available, waiting again...");
+        if(!motion_gen_config_client_->wait_for_service(std::chrono::seconds(3))) {
+            RCLCPP_INFO(node_->get_logger(), "service not available");
+            return;
         }
-        auto future = motion_gen_config_client_->async_send_request(motion_gen_config_request_);
-        RCLCPP_INFO(node_->get_logger(), "Service call sent.");
-        
-        if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
-            auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
-            if (result->success) {
-                RCLCPP_INFO(node_->get_logger(), "Service call successful. %s", result->message.c_str());
-            } else {
-                RCLCPP_ERROR(node_->get_logger(), "Service call failed. %s", result->message.c_str());
-            }
-            // show Trigger message in UI
-            QString msg = result->message.c_str();
-            ui_->labelConfirmChangesMessage->setText(msg);
-            timerConfirmChangesMessage_->start(5000); // 5 seconds
-        } else {
-            RCLCPP_ERROR(node_->get_logger(), "Service call failed.");
-        }
+            // Make the asynchronous (non-blocking) call.
+        motion_gen_config_client_->async_send_request(motion_gen_config_request_,
+        [this](rclcpp::Client<std_srvs::srv::Trigger>::SharedFuture response_future) {
+          auto response = response_future.get();
+          RCLCPP_INFO(node_->get_logger(), "Service call successful");
+          ui_->spinBoxMaxAttempts->setEnabled(true);
+          ui_->doubleSpinBoxTimeout->setEnabled(true);
+          ui_->doubleSpinBoxTimeDilationFactor->setEnabled(true);
+          ui_->doubleSpinBoxVoxelSize->setEnabled(true);
+          ui_->doubleSpinBoxCollisionActivationDistance->setEnabled(true);
+          ui_->confirmPushButton->setEnabled(true);
+        });
+
     }
+
 
 } // curobo_rviz
 

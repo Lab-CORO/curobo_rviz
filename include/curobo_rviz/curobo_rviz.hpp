@@ -49,6 +49,5 @@ namespace curobo_rviz
     std::shared_ptr<std_srvs::srv::Trigger::Request> motion_gen_config_request_;
     int max_attempts_;
     float timeout_, time_dilation_factor_, voxel_size_, collision_activation_distance_;
-    QTimer *timerConfirmChangesMessage_;
   };
 } // curobo_rviz
