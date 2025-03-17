@@ -14,6 +14,7 @@ namespace curobo_rviz
     , time_dilation_factor_{0.0}
     , voxel_size_{0.0}
     , collision_activation_distance_{0.0}
+    , arrow_interaction_{nullptr}
   {
     // Extend the widget with all attributes and children from UI file
     ui_->setupUi(this);
@@ -22,6 +23,10 @@ namespace curobo_rviz
     auto options = rclcpp::NodeOptions().arguments(
         {"--ros-args", "--remap", "__node:=rviz_updata_parameters_node", "--"});
     node_ = std::make_shared<rclcpp::Node>("_", options);
+
+    // Create the arrow to interact with the robot
+    this->arrow_interaction_ = std::make_shared<ArrowInteraction>(node_);
+
     param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "curobo_gen_traj");
 
     motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/update_motion_gen_config");
@@ -224,13 +229,9 @@ namespace curobo_rviz
       auto goal_request = std::make_shared<curobo_msgs::srv::TrajectoryGeneration::Request>();
 
       //TODO This is temporary, next step add and arrow in interface.
-      goal_request->target_pose.position.x = 0.5297468304634094;
-      goal_request->target_pose.position.y = 0.0;
-      goal_request->target_pose.position.z = 1.0622574090957642;
-      goal_request->target_pose.orientation.x = 0.0;
-      goal_request->target_pose.orientation.y = 0.0;
-      goal_request->target_pose.orientation.z = 0.0;
-      goal_request->target_pose.orientation.w = 1.0;
+      auto pose = this->arrow_interaction_->get_pose();
+=      goal_request->target_pose = pose;
+
       
       auto result = this->trajectory_generation_client_->async_send_request(goal_request);
       if (rclcpp::spin_until_future_complete(node_, result) == rclcpp::FutureReturnCode::SUCCESS)

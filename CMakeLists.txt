@@ -39,6 +39,8 @@ set(dependencies_pkgs
   Qt5Widgets
   curobo_msgs
   geometry_msgs
+  visualization_msgs
+  interactive_markers
 )
 
 foreach(pkg IN LISTS dependencies_pkgs)
@@ -54,6 +56,7 @@ set(${PROJECT_NAME}_SRCS
   src/add_objects_display.cpp
   src/add_objects_panel.cpp
   src/curobo_rviz.cpp
+  src/arrow_interaction.cpp
 )
 
 # Define header file
@@ -61,6 +64,7 @@ set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/curobo_rviz.hpp
   include/${PROJECT_NAME}/add_objects_display.hpp
   include/${PROJECT_NAME}/add_objects_panel.hpp
+  include/${PROJECT_NAME}/arrow_interaction.hpp
 )
 
 # Define ui file

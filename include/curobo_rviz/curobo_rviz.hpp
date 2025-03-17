@@ -9,6 +9,9 @@
 #include <std_msgs/msg/u_int8.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_srvs/srv/trigger.hpp>
+
+// Projet
+#include "curobo_rviz/arrow_interaction.hpp"
 #include "curobo_msgs/srv/trajectory_generation.hpp"
 #include "curobo_msgs/action/send_trajectory.hpp"
 
@@ -64,5 +67,7 @@ namespace curobo_rviz
     rclcpp_action::Client<curobo_msgs::action::SendTrajectory>::GoalHandle::SharedPtr goal_handle_;
     int max_attempts_;
     float timeout_, time_dilation_factor_, voxel_size_, collision_activation_distance_;
+    std::shared_ptr<ArrowInteraction> arrow_interaction_; 
+
   };
 } // curobo_rviz
