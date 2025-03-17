@@ -1,11 +1,17 @@
 #pragma once
+#include <iostream>
+#include <functional>
 
 // ROS2
 #include <rclcpp/rclcpp.hpp>
+#include "rclcpp_action/rclcpp_action.hpp"
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/u_int8.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_srvs/srv/trigger.hpp>
+#include "curobo_msgs/srv/trajectory_generation.hpp"
+#include "curobo_msgs/action/send_trajectory.hpp"
+
 // RVIZ2
 #include <rviz_common/panel.hpp>
 // Qt
@@ -40,13 +46,22 @@ namespace curobo_rviz
     void updateCollisionActivationDistance(double value);
     void updateParameters();
     void on_confirmPushButton_clicked();
-
+    void on_sendTrajectory_clicked();
+    void on_generateTrajectory_clicked();
+    void on_generateAndSend_clicked();
+    void on_stopRobot_clicked();
+    void result_callback(const rclcpp_action::ClientGoalHandle<curobo_msgs::action::SendTrajectory>::WrappedResult & result);
+    void goal_response_callback(std::shared_ptr<rclcpp_action::ClientGoalHandle<curobo_msgs::action::SendTrajectory>> goal_handle);
+      // void goal_response_callback(std::shared_future<rclcpp_action::ClientGoalHandle<actionfaces::action::Fibonacci>::SharedPtr> future)
   private:
     std::unique_ptr<Ui::gui_parameters> ui_;
     rclcpp::Node::SharedPtr node_;
     rclcpp::SyncParametersClient::SharedPtr param_client_;
     rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr motion_gen_config_client_;
     std::shared_ptr<std_srvs::srv::Trigger::Request> motion_gen_config_request_;
+    rclcpp_action::Client<curobo_msgs::action::SendTrajectory>::SharedPtr action_ptr_;
+    rclcpp::Client<curobo_msgs::srv::TrajectoryGeneration>::SharedPtr trajectory_generation_client_;
+    rclcpp_action::Client<curobo_msgs::action::SendTrajectory>::GoalHandle::SharedPtr goal_handle_;
     int max_attempts_;
     float timeout_, time_dilation_factor_, voxel_size_, collision_activation_distance_;
   };

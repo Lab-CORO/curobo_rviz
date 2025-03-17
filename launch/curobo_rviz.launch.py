@@ -31,13 +31,6 @@ def generate_launch_description():
     # Création de la description de lancement
     ld = LaunchDescription()
 
-    # Ajout des arguments de lancement
-    # ld.add_action(max_attempts_arg)
-    # ld.add_action(timeout_arg)
-    # ld.add_action(time_dilation_factor_arg)
-    # ld.add_action(voxel_size_arg)
-    # ld.add_action(collision_activation_distance_arg)
-
     # Ajout du nœud rviz2
     ld.add_action(start_rviz2)
 
