@@ -230,7 +230,7 @@ namespace curobo_rviz
 
       //TODO This is temporary, next step add and arrow in interface.
       auto pose = this->arrow_interaction_->get_pose();
-=      goal_request->target_pose = pose;
+      goal_request->target_pose = pose;
 
       
       auto result = this->trajectory_generation_client_->async_send_request(goal_request);
