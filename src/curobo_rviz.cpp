@@ -25,8 +25,8 @@ namespace curobo_rviz
         {"--ros-args", "--remap", "__node:=rviz_updata_parameters_node", "--"});
     node_ = std::make_shared<rclcpp::Node>("_", options);
 
-    // Create the arrow to interact with the robot
-    this->arrow_interaction_ = std::make_shared<ArrowInteraction>(node_);
+    // Try to find ArrowInteractionDisplay, will be set by timer if not immediately available
+    this->arrow_interaction_ = nullptr;
 
     param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "curobo_gen_traj");
 
@@ -78,8 +78,10 @@ namespace curobo_rviz
     connect(poseUpdateTimer, &QTimer::timeout, this, &RvizArgsPanel::updateMarkerPoseDisplay);
     poseUpdateTimer->start(100); // Update pose display every 100ms
 
-    // Initialize frame_id display
-    ui_->lineEditFrameId->setText(QString::fromStdString(arrow_interaction_->getFrameId()));
+    // Timer to find ArrowInteractionDisplay
+    QTimer* findDisplayTimer = new QTimer(this);
+    connect(findDisplayTimer, &QTimer::timeout, this, &RvizArgsPanel::findArrowInteractionDisplay);
+    findDisplayTimer->start(500); // Check every 500ms until found
   }
 
   RvizArgsPanel::~RvizArgsPanel()
@@ -235,6 +237,11 @@ namespace curobo_rviz
   }
 
     void RvizArgsPanel::on_generateTrajectory_clicked(){
+      if (!arrow_interaction_) {
+        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available yet. Please add ArrowInteractionDisplay to RViz.");
+        return;
+      }
+
       auto goal_request = std::make_shared<curobo_msgs::srv::TrajectoryGeneration::Request>();
 
       //TODO This is temporary, next step add and arrow in interface.
@@ -265,6 +272,10 @@ namespace curobo_rviz
     }
 
     void RvizArgsPanel::on_pushButtonApplyFrameId_clicked(){
+      if (!arrow_interaction_) {
+        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available yet.");
+        return;
+      }
       std::string new_frame_id = ui_->lineEditFrameId->text().toStdString();
       if (!new_frame_id.empty()) {
         arrow_interaction_->setFrameId(new_frame_id);
@@ -273,17 +284,72 @@ namespace curobo_rviz
     }
 
     void RvizArgsPanel::on_pushButtonResetMarker_clicked(){
+      if (!arrow_interaction_) {
+        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available yet.");
+        return;
+      }
       arrow_interaction_->resetPose();
       RCLCPP_INFO(node_->get_logger(), "Marker reset to origin");
     }
 
     void RvizArgsPanel::on_checkBoxMarkerVisible_stateChanged(int state){
+      if (!arrow_interaction_) {
+        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available yet.");
+        return;
+      }
       bool visible = (state == Qt::Checked);
       arrow_interaction_->setVisible(visible);
       RCLCPP_INFO(node_->get_logger(), "Marker visibility: %s", visible ? "visible" : "hidden");
     }
 
+    void RvizArgsPanel::findArrowInteractionDisplay(){
+      // If already found, stop searching
+      if (arrow_interaction_ != nullptr) {
+        return;
+      }
+
+      // context_ is a DisplayContext*, it should have access to displays
+      if (!context_) {
+        return;
+      }
+
+      // Get the root display group from the visualization manager
+      auto vis_manager = context_->getVisualizationManager();
+      if (!vis_manager) {
+        return;
+      }
+
+      auto root_display = vis_manager->getRootDisplayGroup();
+      if (!root_display) {
+        return;
+      }
+
+      // Search for ArrowInteractionDisplay
+      for (int i = 0; i < root_display->numDisplays(); ++i) {
+        auto display = root_display->getDisplayAt(i);
+        if (display) {
+          // Try to cast to ArrowInteractionDisplay
+          auto arrow_display = dynamic_cast<ArrowInteractionDisplay*>(display);
+          if (arrow_display) {
+            // Found it!
+            arrow_interaction_ = arrow_display->getArrowInteraction();
+            if (arrow_interaction_) {
+              RCLCPP_INFO(node_->get_logger(), "Found ArrowInteractionDisplay, using its marker");
+              // Initialize frame_id display
+              ui_->lineEditFrameId->setText(QString::fromStdString(arrow_interaction_->getFrameId()));
+            }
+            return;
+          }
+        }
+      }
+    }
+
     void RvizArgsPanel::updateMarkerPoseDisplay(){
+      // Don't update if marker not found yet
+      if (!arrow_interaction_) {
+        return;
+      }
+
       auto pose = arrow_interaction_->get_pose();
 
       // Convert quaternion to RPY

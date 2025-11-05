@@ -12,11 +12,14 @@
 
 // Projet
 #include "curobo_rviz/arrow_interaction.hpp"
+#include "curobo_rviz/arrow_interaction_display.hpp"
 #include "curobo_msgs/srv/trajectory_generation.hpp"
 #include "curobo_msgs/action/send_trajectory.hpp"
 
 // RVIZ2
 #include <rviz_common/panel.hpp>
+#include <rviz_common/display_context.hpp>
+#include <rviz_common/visualization_manager.hpp>
 // Qt
 #include <QtWidgets>
 // STL
@@ -62,6 +65,8 @@ namespace curobo_rviz
     void on_pushButtonResetMarker_clicked();
     void on_checkBoxMarkerVisible_stateChanged(int state);
     void updateMarkerPoseDisplay();
+    void findArrowInteractionDisplay();
+
   private:
     std::unique_ptr<Ui::gui_parameters> ui_;
     rclcpp::Node::SharedPtr node_;
