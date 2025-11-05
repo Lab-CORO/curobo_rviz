@@ -56,6 +56,12 @@ namespace curobo_rviz
     void result_callback(const rclcpp_action::ClientGoalHandle<curobo_msgs::action::SendTrajectory>::WrappedResult & result);
     void goal_response_callback(std::shared_ptr<rclcpp_action::ClientGoalHandle<curobo_msgs::action::SendTrajectory>> goal_handle);
       // void goal_response_callback(std::shared_future<rclcpp_action::ClientGoalHandle<actionfaces::action::Fibonacci>::SharedPtr> future)
+
+    // Marker control slots
+    void on_pushButtonApplyFrameId_clicked();
+    void on_pushButtonResetMarker_clicked();
+    void on_checkBoxMarkerVisible_stateChanged(int state);
+    void updateMarkerPoseDisplay();
   private:
     std::unique_ptr<Ui::gui_parameters> ui_;
     rclcpp::Node::SharedPtr node_;

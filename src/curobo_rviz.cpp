@@ -1,4 +1,5 @@
 #include "curobo_rviz/curobo_rviz.hpp"
+#include <cmath>
 
 namespace curobo_rviz
 {
@@ -71,6 +72,14 @@ namespace curobo_rviz
         }
     });
     timer->start(100); // checks every 1000 milliseconds (1 second)
+
+    // Timer to update marker pose display
+    QTimer* poseUpdateTimer = new QTimer(this);
+    connect(poseUpdateTimer, &QTimer::timeout, this, &RvizArgsPanel::updateMarkerPoseDisplay);
+    poseUpdateTimer->start(100); // Update pose display every 100ms
+
+    // Initialize frame_id display
+    ui_->lineEditFrameId->setText(QString::fromStdString(arrow_interaction_->getFrameId()));
   }
 
   RvizArgsPanel::~RvizArgsPanel()
@@ -255,6 +264,63 @@ namespace curobo_rviz
       }
     }
 
+    void RvizArgsPanel::on_pushButtonApplyFrameId_clicked(){
+      std::string new_frame_id = ui_->lineEditFrameId->text().toStdString();
+      if (!new_frame_id.empty()) {
+        arrow_interaction_->setFrameId(new_frame_id);
+        RCLCPP_INFO(node_->get_logger(), "Marker frame_id changed to: %s", new_frame_id.c_str());
+      }
+    }
+
+    void RvizArgsPanel::on_pushButtonResetMarker_clicked(){
+      arrow_interaction_->resetPose();
+      RCLCPP_INFO(node_->get_logger(), "Marker reset to origin");
+    }
+
+    void RvizArgsPanel::on_checkBoxMarkerVisible_stateChanged(int state){
+      bool visible = (state == Qt::Checked);
+      arrow_interaction_->setVisible(visible);
+      RCLCPP_INFO(node_->get_logger(), "Marker visibility: %s", visible ? "visible" : "hidden");
+    }
+
+    void RvizArgsPanel::updateMarkerPoseDisplay(){
+      auto pose = arrow_interaction_->get_pose();
+
+      // Convert quaternion to RPY
+      double roll, pitch, yaw;
+      double qx = pose.orientation.x;
+      double qy = pose.orientation.y;
+      double qz = pose.orientation.z;
+      double qw = pose.orientation.w;
+
+      // Roll (x-axis rotation)
+      double sinr_cosp = 2.0 * (qw * qx + qy * qz);
+      double cosr_cosp = 1.0 - 2.0 * (qx * qx + qy * qy);
+      roll = std::atan2(sinr_cosp, cosr_cosp);
+
+      // Pitch (y-axis rotation)
+      double sinp = 2.0 * (qw * qy - qz * qx);
+      if (std::abs(sinp) >= 1)
+        pitch = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+      else
+        pitch = std::asin(sinp);
+
+      // Yaw (z-axis rotation)
+      double siny_cosp = 2.0 * (qw * qz + qx * qy);
+      double cosy_cosp = 1.0 - 2.0 * (qy * qy + qz * qz);
+      yaw = std::atan2(siny_cosp, cosy_cosp);
+
+      // Update the label
+      QString poseText = QString("X: %1  Y: %2  Z: %3\nR: %4  P: %5  Y: %6")
+        .arg(pose.position.x, 6, 'f', 3)
+        .arg(pose.position.y, 6, 'f', 3)
+        .arg(pose.position.z, 6, 'f', 3)
+        .arg(roll, 6, 'f', 3)
+        .arg(pitch, 6, 'f', 3)
+        .arg(yaw, 6, 'f', 3);
+
+      ui_->labelPoseValues->setText(poseText);
+    }
 
 
 } // curobo_rviz
