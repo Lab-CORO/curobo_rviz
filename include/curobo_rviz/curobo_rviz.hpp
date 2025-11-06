@@ -20,6 +20,8 @@
 #include <rviz_common/panel.hpp>
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/visualization_manager.hpp>
+#include <rviz_common/display_group.hpp>
+#include <rviz_common/display.hpp>
 // Qt
 #include <QtWidgets>
 // STL

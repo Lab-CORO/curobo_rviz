@@ -308,18 +308,14 @@ namespace curobo_rviz
         return;
       }
 
-      // context_ is a DisplayContext*, it should have access to displays
-      if (!context_) {
+      // getDisplayContext() is the public method to access context
+      auto context = getDisplayContext();
+      if (!context) {
         return;
       }
 
-      // Get the root display group from the visualization manager
-      auto vis_manager = context_->getVisualizationManager();
-      if (!vis_manager) {
-        return;
-      }
-
-      auto root_display = vis_manager->getRootDisplayGroup();
+      // Get the root display group directly from context
+      auto root_display = context->getRootDisplayGroup();
       if (!root_display) {
         return;
       }
