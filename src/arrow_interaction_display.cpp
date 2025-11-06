@@ -28,10 +28,9 @@ namespace curobo_rviz
 
     void ArrowInteractionDisplay::onInitialize()
     {
-        // Create ROS2 node for this display
-        auto options = rclcpp::NodeOptions().arguments(
-            {"--ros-args", "--remap", "__node:=rviz_arrow_interaction_display_node", "--"});
-        node_ = std::make_shared<rclcpp::Node>("_", options);
+        // Use RViz's main node instead of creating a new one
+        // This ensures the node is already being spun by RViz
+        node_ = context_->getRos2Node();
 
         // Create the arrow interaction instance
         arrow_interaction_ = std::make_shared<ArrowInteraction>(node_);
