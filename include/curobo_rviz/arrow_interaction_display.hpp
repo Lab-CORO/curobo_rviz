@@ -6,6 +6,7 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/display.hpp>
+#include <rviz_common/display_context.hpp>
 #include <rviz_common/properties/string_property.hpp>
 #include <rviz_common/properties/bool_property.hpp>
 

@@ -30,7 +30,7 @@ namespace curobo_rviz
     {
         // Use RViz's main node instead of creating a new one
         // This ensures the node is already being spun by RViz
-        node_ = context_->getRos2Node();
+        node_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
 
         // Create the arrow interaction instance
         arrow_interaction_ = std::make_shared<ArrowInteraction>(node_);
