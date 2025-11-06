@@ -90,13 +90,37 @@ namespace curobo_rviz
     void RvizArgsPanel::load(const rviz_common::Config &config)
     {
       Panel::load(config);
-      // set initial values in UI to the values from the parameter server
-      
-      ui_->spinBoxMaxAttempts->setValue(this->node_->get_parameter("max_attempts").as_int());
-      ui_->doubleSpinBoxTimeout->setValue(this->node_->get_parameter("timeout").as_double());
-      ui_->doubleSpinBoxTimeDilationFactor->setValue(this->node_->get_parameter("time_dilation_factor").as_double());
-      ui_->doubleSpinBoxVoxelSize->setValue(this->node_->get_parameter("voxel_size").as_double());
-      ui_->doubleSpinBoxCollisionActivationDistance->setValue(this->node_->get_parameter("collision_activation_distance").as_double());
+
+      // Load values from RViz config file
+      int max_attempts;
+      if (config.mapGetInt("max_attempts", &max_attempts)) {
+        max_attempts_ = max_attempts;
+        ui_->spinBoxMaxAttempts->setValue(max_attempts);
+      }
+
+      float timeout;
+      if (config.mapGetFloat("timeout", &timeout)) {
+        timeout_ = timeout;
+        ui_->doubleSpinBoxTimeout->setValue(timeout);
+      }
+
+      float time_dilation_factor;
+      if (config.mapGetFloat("time_dilation_factor", &time_dilation_factor)) {
+        time_dilation_factor_ = time_dilation_factor;
+        ui_->doubleSpinBoxTimeDilationFactor->setValue(time_dilation_factor);
+      }
+
+      float voxel_size;
+      if (config.mapGetFloat("voxel_size", &voxel_size)) {
+        voxel_size_ = voxel_size;
+        ui_->doubleSpinBoxVoxelSize->setValue(voxel_size);
+      }
+
+      float collision_activation_distance;
+      if (config.mapGetFloat("collision_activation_distance", &collision_activation_distance)) {
+        collision_activation_distance_ = collision_activation_distance;
+        ui_->doubleSpinBoxCollisionActivationDistance->setValue(collision_activation_distance);
+      }
     }
 
     void RvizArgsPanel::save(rviz_common::Config config) const
