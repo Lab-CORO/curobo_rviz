@@ -19,7 +19,7 @@
      <x>0</x>
      <y>0</y>
      <width>454</width>
-     <height>120</height>
+     <height>125</height>
     </rect>
    </property>
    <property name="title">
@@ -64,40 +64,227 @@
      <string>Apply</string>
     </property>
    </widget>
-   <widget class="QLabel" name="labelCurrentPose">
+   <widget class="QLabel" name="labelPosition">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>55</y>
-      <width>100</width>
-      <height>25</height>
+      <width>60</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Current Pose:</string>
+     <string>Position:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="labelPoseValues">
+   <widget class="QLabel" name="labelX">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>75</y>
-      <width>290</width>
-      <height>35</height>
+      <width>20</width>
+      <height>20</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Monospace</family>
-      <pointsize>8</pointsize>
-     </font>
+    <property name="text">
+     <string>X:</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="spinBoxPosX">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>75</y>
+      <width>80</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelY">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>75</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
     </property>
     <property name="text">
-     <string>X: 0.000  Y: 0.000  Z: 0.000
-R: 0.000  P: 0.000  Y: 0.000</string>
+     <string>Y:</string>
     </property>
-    <property name="wordWrap">
-     <bool>true</bool>
+   </widget>
+   <widget class="QDoubleSpinBox" name="spinBoxPosY">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>75</y>
+      <width>80</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelZ">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>75</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Z:</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="spinBoxPosZ">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>75</y>
+      <width>80</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelRoll">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>97</y>
+      <width>30</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Roll:</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="spinBoxRoll">
+    <property name="geometry">
+     <rect>
+      <x>45</x>
+      <y>97</y>
+      <width>65</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>2</number>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>1.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelPitch">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>97</y>
+      <width>35</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pitch:</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="spinBoxPitch">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>97</y>
+      <width>60</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>2</number>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>1.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelYaw">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>97</y>
+      <width>30</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Yaw:</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="spinBoxYaw">
+    <property name="geometry">
+     <rect>
+      <x>265</x>
+      <y>97</y>
+      <width>65</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>2</number>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>1.000000000000000</double>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButtonResetMarker">

@@ -46,6 +46,9 @@ namespace curobo_rviz
     virtual void load(const rviz_common::Config &config) override;
     virtual void save(rviz_common::Config config) const override;
 
+    /// Event filter to detect when user starts editing pose spinboxes
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
   private Q_SLOTS:
     void updateMaxAttempts(int value);
     void updateTimeout(double value);
@@ -68,6 +71,11 @@ namespace curobo_rviz
     void on_checkBoxMarkerVisible_stateChanged(int state);
     void updateMarkerPoseDisplay();
     void findArrowInteractionDisplay();
+    void applyPoseFromSpinboxes();
+
+    // Helper methods for quaternion <-> Euler conversion
+    void quaternionToEuler(const geometry_msgs::msg::Quaternion& q, double& roll, double& pitch, double& yaw);
+    void eulerToQuaternion(double roll, double pitch, double yaw, geometry_msgs::msg::Quaternion& q);
 
   private:
     std::unique_ptr<Ui::gui_parameters> ui_;
@@ -80,7 +88,16 @@ namespace curobo_rviz
     rclcpp_action::Client<curobo_msgs::action::SendTrajectory>::GoalHandle::SharedPtr goal_handle_;
     int max_attempts_;
     float timeout_, time_dilation_factor_, voxel_size_, collision_activation_distance_;
-    std::shared_ptr<ArrowInteraction> arrow_interaction_; 
+    std::shared_ptr<ArrowInteraction> arrow_interaction_;
+    bool user_editing_pose_; // Flag to prevent auto-update while user is editing
+
+    // Last displayed pose to avoid unnecessary updates
+    double last_displayed_x_;
+    double last_displayed_y_;
+    double last_displayed_z_;
+    double last_displayed_roll_;
+    double last_displayed_pitch_;
+    double last_displayed_yaw_;
 
   };
 } // curobo_rviz

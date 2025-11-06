@@ -43,6 +43,12 @@ public:
   /// Reset marker to origin position
   void resetPose();
 
+  /// Set marker pose (position only, keeps current orientation)
+  void setPose(const geometry_msgs::msg::Point& position);
+
+  /// Set marker pose with orientation
+  void setPoseWithOrientation(const geometry_msgs::msg::Pose& pose);
+
   /// Set marker visibility
   void setVisible(bool visible);
 

@@ -12,8 +12,8 @@ namespace curobo_rviz
     {
         // Create properties that will appear in RViz Display panel
         frame_id_property_ = new rviz_common::properties::StringProperty(
-            "Reference Frame", "base_0",
-            "Frame ID for the interactive marker",
+            "Reference Frame", "",
+            "Frame ID for the interactive marker (empty = use RViz Fixed Frame)",
             this, SLOT(updateFrameId()));
 
         visible_property_ = new rviz_common::properties::BoolProperty(
@@ -35,14 +35,22 @@ namespace curobo_rviz
         // Create the arrow interaction instance
         arrow_interaction_ = std::make_shared<ArrowInteraction>(node_);
 
-        // Set initial frame ID from property
+        // Get the fixed frame from RViz context
+        std::string fixed_frame = context_->getFrameManager()->getFixedFrame();
+
+        // Set initial frame ID from property, or use fixed frame if property is empty
         std::string frame_id = frame_id_property_->getStdString();
-        if (!frame_id.empty()) {
-            arrow_interaction_->setFrameId(frame_id);
+        if (frame_id.empty() || frame_id == "base_0") {
+            // Use RViz's fixed frame as default instead of base_0
+            frame_id = fixed_frame;
+            frame_id_property_->setStdString(frame_id);
         }
 
-        RCLCPP_INFO(node_->get_logger(), "ArrowInteractionDisplay initialized with frame: %s",
-                    frame_id.c_str());
+        arrow_interaction_->setFrameId(frame_id);
+
+        RCLCPP_INFO(node_->get_logger(), "ArrowInteractionDisplay initialized with frame: %s (RViz fixed frame: %s)",
+                    frame_id.c_str(), fixed_frame.c_str());
+        RCLCPP_INFO(node_->get_logger(), "IMPORTANT: Add an 'InteractiveMarkers' Display in RViz and set its topic to '/simple_marker/update'");
     }
 
     void ArrowInteractionDisplay::onEnable()
