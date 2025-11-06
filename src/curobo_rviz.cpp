@@ -340,37 +340,6 @@ namespace curobo_rviz
       }
     }
 
-    void RvizArgsPanel::on_pushButtonApplyFrameId_clicked(){
-      if (!arrow_interaction_) {
-        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available yet.");
-        return;
-      }
-      std::string new_frame_id = ui_->lineEditFrameId->text().toStdString();
-      if (!new_frame_id.empty()) {
-        arrow_interaction_->setFrameId(new_frame_id);
-        RCLCPP_INFO(node_->get_logger(), "Marker frame_id changed to: %s", new_frame_id.c_str());
-      }
-    }
-
-    void RvizArgsPanel::on_pushButtonResetMarker_clicked(){
-      if (!arrow_interaction_) {
-        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available yet.");
-        return;
-      }
-      arrow_interaction_->resetPose();
-      RCLCPP_INFO(node_->get_logger(), "Marker reset to origin");
-    }
-
-    void RvizArgsPanel::on_checkBoxMarkerVisible_stateChanged(int state){
-      if (!arrow_interaction_) {
-        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available yet.");
-        return;
-      }
-      bool visible = (state == Qt::Checked);
-      arrow_interaction_->setVisible(visible);
-      RCLCPP_INFO(node_->get_logger(), "Marker visibility: %s", visible ? "visible" : "hidden");
-    }
-
     void RvizArgsPanel::findArrowInteractionDisplay(){
       // If already found, stop searching
       if (arrow_interaction_ != nullptr) {
@@ -400,8 +369,6 @@ namespace curobo_rviz
             arrow_interaction_ = arrow_display->getArrowInteraction();
             if (arrow_interaction_) {
               RCLCPP_INFO(node_->get_logger(), "Found ArrowInteractionDisplay, using its marker");
-              // Initialize frame_id display
-              ui_->lineEditFrameId->setText(QString::fromStdString(arrow_interaction_->getFrameId()));
             }
             return;
           }

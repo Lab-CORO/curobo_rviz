@@ -66,9 +66,6 @@ namespace curobo_rviz
       // void goal_response_callback(std::shared_future<rclcpp_action::ClientGoalHandle<actionfaces::action::Fibonacci>::SharedPtr> future)
 
     // Marker control slots
-    void on_pushButtonApplyFrameId_clicked();
-    void on_pushButtonResetMarker_clicked();
-    void on_checkBoxMarkerVisible_stateChanged(int state);
     void updateMarkerPoseDisplay();
     void findArrowInteractionDisplay();
     void applyPoseFromSpinboxes();

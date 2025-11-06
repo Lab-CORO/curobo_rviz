@@ -36,12 +36,13 @@ namespace curobo_rviz
         arrow_interaction_ = std::make_shared<ArrowInteraction>(node_);
 
         // Get the fixed frame from RViz context
+        // This is automatically set by rviz_visualization.launch.py based on base_link from config
         std::string fixed_frame = context_->getFrameManager()->getFixedFrame();
 
-        // Set initial frame ID from property, or use fixed frame if property is empty
+        // Set initial frame ID from property, or use RViz's fixed frame
         std::string frame_id = frame_id_property_->getStdString();
-        if (frame_id.empty() || frame_id == "base_0") {
-            // Use RViz's fixed frame as default instead of base_0
+        if (frame_id.empty()) {
+            // Use RViz's fixed frame (which is set from base_link in launch file)
             frame_id = fixed_frame;
             frame_id_property_->setStdString(frame_id);
         }
