@@ -12,11 +12,16 @@
 
 // Projet
 #include "curobo_rviz/arrow_interaction.hpp"
+#include "curobo_rviz/arrow_interaction_display.hpp"
 #include "curobo_msgs/srv/trajectory_generation.hpp"
 #include "curobo_msgs/action/send_trajectory.hpp"
 
 // RVIZ2
 #include <rviz_common/panel.hpp>
+#include <rviz_common/display_context.hpp>
+#include <rviz_common/visualization_manager.hpp>
+#include <rviz_common/display_group.hpp>
+#include <rviz_common/display.hpp>
 // Qt
 #include <QtWidgets>
 // STL
@@ -41,6 +46,9 @@ namespace curobo_rviz
     virtual void load(const rviz_common::Config &config) override;
     virtual void save(rviz_common::Config config) const override;
 
+    /// Event filter to detect when user starts editing pose spinboxes
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
   private Q_SLOTS:
     void updateMaxAttempts(int value);
     void updateTimeout(double value);
@@ -56,6 +64,19 @@ namespace curobo_rviz
     void result_callback(const rclcpp_action::ClientGoalHandle<curobo_msgs::action::SendTrajectory>::WrappedResult & result);
     void goal_response_callback(std::shared_ptr<rclcpp_action::ClientGoalHandle<curobo_msgs::action::SendTrajectory>> goal_handle);
       // void goal_response_callback(std::shared_future<rclcpp_action::ClientGoalHandle<actionfaces::action::Fibonacci>::SharedPtr> future)
+
+    // Marker control slots
+    void on_pushButtonApplyFrameId_clicked();
+    void on_pushButtonResetMarker_clicked();
+    void on_checkBoxMarkerVisible_stateChanged(int state);
+    void updateMarkerPoseDisplay();
+    void findArrowInteractionDisplay();
+    void applyPoseFromSpinboxes();
+
+    // Helper methods for quaternion <-> Euler conversion
+    void quaternionToEuler(const geometry_msgs::msg::Quaternion& q, double& roll, double& pitch, double& yaw);
+    void eulerToQuaternion(double roll, double pitch, double yaw, geometry_msgs::msg::Quaternion& q);
+
   private:
     std::unique_ptr<Ui::gui_parameters> ui_;
     rclcpp::Node::SharedPtr node_;
@@ -67,7 +88,16 @@ namespace curobo_rviz
     rclcpp_action::Client<curobo_msgs::action::SendTrajectory>::GoalHandle::SharedPtr goal_handle_;
     int max_attempts_;
     float timeout_, time_dilation_factor_, voxel_size_, collision_activation_distance_;
-    std::shared_ptr<ArrowInteraction> arrow_interaction_; 
+    std::shared_ptr<ArrowInteraction> arrow_interaction_;
+    bool user_editing_pose_; // Flag to prevent auto-update while user is editing
+
+    // Last displayed pose to avoid unnecessary updates
+    double last_displayed_x_;
+    double last_displayed_y_;
+    double last_displayed_z_;
+    double last_displayed_roll_;
+    double last_displayed_pitch_;
+    double last_displayed_yaw_;
 
   };
 } // curobo_rviz

@@ -18,5 +18,11 @@
         base_class_type="rviz_common::Display">
     <description>Add Objects Display</description>
   </class>
-  
+
+  <class name="curobo_rviz/ArrowInteractionDisplay"
+        type="curobo_rviz::ArrowInteractionDisplay"
+        base_class_type="rviz_common::Display">
+    <description>Interactive 6-DOF Arrow Marker for Target Pose</description>
+  </class>
+
 </library>

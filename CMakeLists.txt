@@ -57,6 +57,7 @@ set(${PROJECT_NAME}_SRCS
   src/add_objects_panel.cpp
   src/curobo_rviz.cpp
   src/arrow_interaction.cpp
+  src/arrow_interaction_display.cpp
 )
 
 # Define header file
@@ -65,6 +66,7 @@ set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/add_objects_display.hpp
   include/${PROJECT_NAME}/add_objects_panel.hpp
   include/${PROJECT_NAME}/arrow_interaction.hpp
+  include/${PROJECT_NAME}/arrow_interaction_display.hpp
 )
 
 # Define ui file

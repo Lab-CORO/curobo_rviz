@@ -31,7 +31,26 @@ public:
   /// Create a 6-DOF interactive marker.
   void make6DofMarker(const geometry_msgs::msg::Point & position);
 
+  /// Get current marker pose
   geometry_msgs::msg::Pose get_pose();
+
+  /// Set marker frame ID and recreate the marker
+  void setFrameId(const std::string& frame_id);
+
+  /// Get current frame ID
+  std::string getFrameId() const;
+
+  /// Reset marker to origin position
+  void resetPose();
+
+  /// Set marker pose (position only, keeps current orientation)
+  void setPose(const geometry_msgs::msg::Point& position);
+
+  /// Set marker pose with orientation
+  void setPoseWithOrientation(const geometry_msgs::msg::Pose& pose);
+
+  /// Set marker visibility
+  void setVisible(bool visible);
 
 private:
   rclcpp::Node::SharedPtr node_;
@@ -40,6 +59,8 @@ private:
   rclcpp::Time last_click_time_;
   double double_click_threshold_;
   geometry_msgs::msg::Pose marker_pose_;
+  std::string frame_id_;
+  bool is_visible_;
 };
 
 #endif // SIMPLE_MARKER_HPP
