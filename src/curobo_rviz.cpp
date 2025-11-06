@@ -10,11 +10,8 @@ namespace curobo_rviz
     , param_client_{nullptr}
     , motion_gen_config_client_{nullptr}
     , motion_gen_config_request_{nullptr}
-    , max_attempts_{0}
-    , timeout_{0.0}
     , time_dilation_factor_{0.0}
     , voxel_size_{0.0}
-    , collision_activation_distance_{0.0}
     , arrow_interaction_{nullptr}
     , user_editing_pose_{false}
     , last_displayed_x_{std::numeric_limits<double>::quiet_NaN()}
@@ -23,6 +20,10 @@ namespace curobo_rviz
     , last_displayed_roll_{std::numeric_limits<double>::quiet_NaN()}
     , last_displayed_pitch_{std::numeric_limits<double>::quiet_NaN()}
     , last_displayed_yaw_{std::numeric_limits<double>::quiet_NaN()}
+    , get_voxel_grid_client_{nullptr}
+    , voxel_marker_pub_{nullptr}
+    , obstacle_update_timer_{nullptr}
+    , obstacle_update_frequency_{0.0}
   {
     // Extend the widget with all attributes and children from UI file
     ui_->setupUi(this);
@@ -48,12 +49,23 @@ namespace curobo_rviz
     // create service client to generate traj
     this->trajectory_generation_client_ = node_->create_client<curobo_msgs::srv::TrajectoryGeneration>("/curobo_gen_traj/generate_trajectory");
 
+    // Create service client for getting voxel grid
+    this->get_voxel_grid_client_ = node_->create_client<curobo_msgs::srv::GetVoxelGrid>("/curobo_gen_traj/get_voxel_grid");
+
+    // Create publisher for voxel grid visualization
+    this->voxel_marker_pub_ = node_->create_publisher<visualization_msgs::msg::Marker>("/visualise_voxel_grid", 10);
+
+    // Create timer for automatic obstacle updates
+    obstacle_update_timer_ = new QTimer(this);
+    connect(obstacle_update_timer_, &QTimer::timeout, this, &RvizArgsPanel::updateObstaclesFromTimer);
+
+    // Create service client for setting robot strategy
+    this->set_robot_strategy_client_ = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/set_robot_strategy");
+    current_robot_strategy_ = "";
+
     // Connect SpinBox and DoubleSpinBox to slots
-    connect(ui_->spinBoxMaxAttempts, SIGNAL(valueChanged(int)), this, SLOT(updateMaxAttempts(int)));
-    connect(ui_->doubleSpinBoxTimeout, SIGNAL(valueChanged(double)), this, SLOT(updateTimeout(double)));
     connect(ui_->doubleSpinBoxTimeDilationFactor, SIGNAL(valueChanged(double)), this, SLOT(updateTimeDilationFactor(double)));
     connect(ui_->doubleSpinBoxVoxelSize, SIGNAL(valueChanged(double)), this, SLOT(updateVoxelSize(double)));
-    connect(ui_->doubleSpinBoxCollisionActivationDistance, SIGNAL(valueChanged(double)), this, SLOT(updateCollisionActivationDistance(double)));
     
     ui_->stopRobot->setEnabled(false);
 
@@ -63,18 +75,12 @@ namespace curobo_rviz
         if(param_client_->wait_for_service(std::chrono::milliseconds(10))){
             auto conditionMet = param_client_->get_parameters({"node_is_available"});
             // Enable or disable the widget based on the condition
-            ui_->spinBoxMaxAttempts->setEnabled(conditionMet[0].as_bool());
-            ui_->doubleSpinBoxTimeout->setEnabled(conditionMet[0].as_bool());
             ui_->doubleSpinBoxTimeDilationFactor->setEnabled(conditionMet[0].as_bool());
             ui_->doubleSpinBoxVoxelSize->setEnabled(conditionMet[0].as_bool());
-            ui_->doubleSpinBoxCollisionActivationDistance->setEnabled(conditionMet[0].as_bool());
             ui_->confirmPushButton->setEnabled(conditionMet[0].as_bool());
         }else{
-            ui_->spinBoxMaxAttempts->setEnabled(false);
-            ui_->doubleSpinBoxTimeout->setEnabled(false);
             ui_->doubleSpinBoxTimeDilationFactor->setEnabled(false);
             ui_->doubleSpinBoxVoxelSize->setEnabled(false);
-            ui_->doubleSpinBoxCollisionActivationDistance->setEnabled(false);
             ui_->confirmPushButton->setEnabled(false);
         }
     });
@@ -127,6 +133,13 @@ namespace curobo_rviz
     QTimer* findDisplayTimer = new QTimer(this);
     connect(findDisplayTimer, &QTimer::timeout, this, &RvizArgsPanel::findArrowInteractionDisplay);
     findDisplayTimer->start(500); // Check every 500ms until found
+
+    // Connect obstacle update controls
+    connect(ui_->pushButtonUpdateObstacles, &QPushButton::clicked, this, &RvizArgsPanel::on_pushButtonUpdateObstacles_clicked);
+    connect(ui_->spinBoxUpdateFrequency, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &RvizArgsPanel::updateObstacleFrequency);
+
+    // Connect robot strategy controls
+    connect(ui_->comboBoxRobotStrategy, &QComboBox::currentTextChanged, this, &RvizArgsPanel::on_comboBoxRobotStrategy_currentTextChanged);
   }
 
   RvizArgsPanel::~RvizArgsPanel()
@@ -137,18 +150,6 @@ namespace curobo_rviz
       Panel::load(config);
 
       // Load values from RViz config file
-      int max_attempts;
-      if (config.mapGetInt("max_attempts", &max_attempts)) {
-        max_attempts_ = max_attempts;
-        ui_->spinBoxMaxAttempts->setValue(max_attempts);
-      }
-
-      float timeout;
-      if (config.mapGetFloat("timeout", &timeout)) {
-        timeout_ = timeout;
-        ui_->doubleSpinBoxTimeout->setValue(timeout);
-      }
-
       float time_dilation_factor;
       if (config.mapGetFloat("time_dilation_factor", &time_dilation_factor)) {
         time_dilation_factor_ = time_dilation_factor;
@@ -160,41 +161,15 @@ namespace curobo_rviz
         voxel_size_ = voxel_size;
         ui_->doubleSpinBoxVoxelSize->setValue(voxel_size);
       }
-
-      float collision_activation_distance;
-      if (config.mapGetFloat("collision_activation_distance", &collision_activation_distance)) {
-        collision_activation_distance_ = collision_activation_distance;
-        ui_->doubleSpinBoxCollisionActivationDistance->setValue(collision_activation_distance);
-      }
     }
 
     void RvizArgsPanel::save(rviz_common::Config config) const
     {
       Panel::save(config);
-      config.mapSetValue("max_attempts", max_attempts_);
-      config.mapSetValue("timeout", timeout_);
       config.mapSetValue("time_dilation_factor", time_dilation_factor_);
       config.mapSetValue("voxel_size", voxel_size_);
-      config.mapSetValue("collision_activation_distance", collision_activation_distance_);
     }
 
-    void RvizArgsPanel::updateMaxAttempts(int value)
-    {
-        max_attempts_ = value;
-        
-        // set parameters on parameter server
-        param_client_->set_parameters_atomically({rclcpp::Parameter("max_attempts", max_attempts_)});
-        RCLCPP_INFO(node_->get_logger(), "Max attempts set to %d", max_attempts_);
-    }
-
-    void RvizArgsPanel::updateTimeout(double value)
-    {
-        timeout_ = value;
-        
-        // set parameters on parameter server
-        param_client_->set_parameters_atomically({rclcpp::Parameter("timeout", timeout_)});
-        RCLCPP_INFO(node_->get_logger(), "Timeout set to %.2f", timeout_);
-    }
 
     void RvizArgsPanel::updateTimeDilationFactor(double value)
     {
@@ -211,35 +186,25 @@ namespace curobo_rviz
         RCLCPP_INFO(node_->get_logger(), "Voxel size changed to %.2f", voxel_size_);
     }
 
-    void RvizArgsPanel::updateCollisionActivationDistance(double value)
-    {
-        collision_activation_distance_ = value;
-        RCLCPP_INFO(node_->get_logger(), "Collision activation distance changed to %.2f", collision_activation_distance_);
-    }
-
     void RvizArgsPanel::on_confirmPushButton_clicked()
     {
         if (!ui_->confirmPushButton->isEnabled()) {
             return;
           }
         // Set ui to disable
-        ui_->spinBoxMaxAttempts->setEnabled(false);
-        ui_->doubleSpinBoxTimeout->setEnabled(false);
         ui_->doubleSpinBoxTimeDilationFactor->setEnabled(false);
         ui_->doubleSpinBoxVoxelSize->setEnabled(false);
-        ui_->doubleSpinBoxCollisionActivationDistance->setEnabled(false);
         ui_->confirmPushButton->setEnabled(false);
         RCLCPP_INFO(node_->get_logger(), "Confirm button clicked.");
         if (!param_client_->wait_for_service(std::chrono::seconds(3))) {
             RCLCPP_INFO(node_->get_logger(), "service not available");
             return;
         }
-        
+
         // set parameters on parameter server
-        param_client_->set_parameters_atomically({rclcpp::Parameter("voxel_size", voxel_size_),
-                                       rclcpp::Parameter("collision_activation_distance", collision_activation_distance_)});
-        RCLCPP_INFO(node_->get_logger(), "Parameters set:\voxel_size: %.2f, collision_activation_distance: %.2f", voxel_size_, collision_activation_distance_);
-        
+        param_client_->set_parameters_atomically({rclcpp::Parameter("voxel_size", voxel_size_)});
+        RCLCPP_INFO(node_->get_logger(), "Parameters set:\voxel_size: %.2f", voxel_size_);
+
 
         if(!motion_gen_config_client_->wait_for_service(std::chrono::seconds(3))) {
             RCLCPP_INFO(node_->get_logger(), "service not available");
@@ -250,11 +215,8 @@ namespace curobo_rviz
         [this](rclcpp::Client<std_srvs::srv::Trigger>::SharedFuture response_future) {
           auto response = response_future.get();
           RCLCPP_INFO(node_->get_logger(), "Service call successful");
-          ui_->spinBoxMaxAttempts->setEnabled(true);
-          ui_->doubleSpinBoxTimeout->setEnabled(true);
           ui_->doubleSpinBoxTimeDilationFactor->setEnabled(true);
           ui_->doubleSpinBoxVoxelSize->setEnabled(true);
-          ui_->doubleSpinBoxCollisionActivationDistance->setEnabled(true);
           ui_->confirmPushButton->setEnabled(true);
         });
 
@@ -528,6 +490,162 @@ namespace curobo_rviz
       ui_->spinBoxRoll->blockSignals(false);
       ui_->spinBoxPitch->blockSignals(false);
       ui_->spinBoxYaw->blockSignals(false);
+    }
+
+    void RvizArgsPanel::on_pushButtonUpdateObstacles_clicked() {
+      RCLCPP_INFO(node_->get_logger(), "Update Obstacles button clicked");
+
+      // Check if service is available
+      if (!get_voxel_grid_client_->wait_for_service(std::chrono::seconds(1))) {
+        RCLCPP_WARN(node_->get_logger(), "GetVoxelGrid service not available");
+        return;
+      }
+
+      // Create request
+      auto request = std::make_shared<curobo_msgs::srv::GetVoxelGrid::Request>();
+
+      // Call service asynchronously
+      auto future = get_voxel_grid_client_->async_send_request(request,
+        [this](rclcpp::Client<curobo_msgs::srv::GetVoxelGrid>::SharedFuture future) {
+          try {
+            auto response = future.get();
+
+            // Create marker from voxel grid
+            auto marker = std::make_shared<visualization_msgs::msg::Marker>();
+            // Get base_link parameter from node, default to "base_link"
+            std::string base_link = "base_link";
+            if (node_->has_parameter("base_link")) {
+              base_link = node_->get_parameter("base_link").as_string();
+            }
+            marker->header.frame_id = base_link;
+            marker->header.stamp = node_->get_clock()->now();
+            marker->ns = "voxel_grid";
+            marker->id = 0;
+            marker->type = visualization_msgs::msg::Marker::CUBE_LIST;
+            marker->action = visualization_msgs::msg::Marker::ADD;
+
+            auto& voxel_grid = response->voxel_grid;
+            marker->scale.x = voxel_grid.resolutions.x;
+            marker->scale.y = voxel_grid.resolutions.y;
+            marker->scale.z = voxel_grid.resolutions.z;
+
+            // Set marker color (green)
+            marker->color.r = 0.0;
+            marker->color.g = 1.0;
+            marker->color.b = 0.0;
+            marker->color.a = 1.0;
+
+            // Convert voxel grid data into cubes
+            size_t index = 0;
+            for (size_t x = 0; x < voxel_grid.size_z; x++) {
+              for (size_t y = 0; y < voxel_grid.size_y; y++) {
+                for (size_t z = 0; z < voxel_grid.size_x; z++) {
+                  if (voxel_grid.data[index] > 0) {
+                    geometry_msgs::msg::Point point;
+                    point.x = voxel_grid.origin.x + x * voxel_grid.resolutions.x;
+                    point.y = voxel_grid.origin.y + y * voxel_grid.resolutions.y;
+                    point.z = voxel_grid.origin.z + z * voxel_grid.resolutions.z;
+                    marker->points.push_back(point);
+                  }
+                  index++;
+                }
+              }
+            }
+
+            // Publish marker
+            voxel_marker_pub_->publish(*marker);
+            RCLCPP_INFO(node_->get_logger(), "Published voxel grid visualization with %zu occupied voxels", marker->points.size());
+
+          } catch (const std::exception& e) {
+            RCLCPP_ERROR(node_->get_logger(), "Failed to get voxel grid: %s", e.what());
+          }
+        });
+    }
+
+    void RvizArgsPanel::updateObstacleFrequency(double value) {
+      obstacle_update_frequency_ = value;
+
+      // Stop timer if frequency is 0
+      if (obstacle_update_frequency_ <= 0.0) {
+        obstacle_update_timer_->stop();
+        ui_->labelUpdateStatus->setText("Off");
+        RCLCPP_INFO(node_->get_logger(), "Obstacle auto-update disabled");
+      } else {
+        // Convert Hz to milliseconds
+        int interval_ms = static_cast<int>(1000.0 / obstacle_update_frequency_);
+        obstacle_update_timer_->start(interval_ms);
+        ui_->labelUpdateStatus->setText(QString("%.1f Hz").arg(obstacle_update_frequency_));
+        RCLCPP_INFO(node_->get_logger(), "Obstacle auto-update set to %.1f Hz (every %d ms)",
+                    obstacle_update_frequency_, interval_ms);
+      }
+    }
+
+    void RvizArgsPanel::updateObstaclesFromTimer() {
+      // Call the same method as the button
+      on_pushButtonUpdateObstacles_clicked();
+    }
+
+    void RvizArgsPanel::on_comboBoxRobotStrategy_currentTextChanged(const QString &text) {
+      RCLCPP_INFO(node_->get_logger(), "Robot strategy changed to: %s", text.toStdString().c_str());
+
+      std::string new_strategy = text.toStdString();
+
+      // Update status label
+      ui_->labelStrategyStatus->setText("Switching...");
+      ui_->labelStrategyStatus->setStyleSheet("QLabel { color : orange; }");
+
+      // Set the robot_type parameter
+      if (!param_client_->wait_for_service(std::chrono::seconds(1))) {
+        RCLCPP_WARN(node_->get_logger(), "Parameter service not available");
+        ui_->labelStrategyStatus->setText("Service unavailable");
+        ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
+        return;
+      }
+
+      try {
+        // Set the robot_type parameter
+        param_client_->set_parameters({rclcpp::Parameter("robot_type", new_strategy)});
+        RCLCPP_INFO(node_->get_logger(), "Set robot_type parameter to: %s", new_strategy.c_str());
+
+        // Call the set_robot_strategy service
+        if (!set_robot_strategy_client_->wait_for_service(std::chrono::seconds(1))) {
+          RCLCPP_WARN(node_->get_logger(), "SetRobotStrategy service not available");
+          ui_->labelStrategyStatus->setText("Service unavailable");
+          ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
+          return;
+        }
+
+        auto request = std::make_shared<std_srvs::srv::Trigger::Request>();
+
+        auto future = set_robot_strategy_client_->async_send_request(request,
+          [this, new_strategy](rclcpp::Client<std_srvs::srv::Trigger>::SharedFuture future) {
+            try {
+              auto response = future.get();
+
+              if (response->success) {
+                current_robot_strategy_ = new_strategy;
+                ui_->labelStrategyStatus->setText(QString::fromStdString(new_strategy));
+                ui_->labelStrategyStatus->setStyleSheet("QLabel { color : green; }");
+                RCLCPP_INFO(node_->get_logger(), "Successfully switched to strategy: %s", new_strategy.c_str());
+                RCLCPP_INFO(node_->get_logger(), "Service response: %s", response->message.c_str());
+              } else {
+                ui_->labelStrategyStatus->setText("Failed");
+                ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
+                RCLCPP_ERROR(node_->get_logger(), "Failed to switch strategy: %s", response->message.c_str());
+              }
+
+            } catch (const std::exception& e) {
+              ui_->labelStrategyStatus->setText("Error");
+              ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
+              RCLCPP_ERROR(node_->get_logger(), "Exception calling set_robot_strategy service: %s", e.what());
+            }
+          });
+
+      } catch (const std::exception& e) {
+        ui_->labelStrategyStatus->setText("Error");
+        ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
+        RCLCPP_ERROR(node_->get_logger(), "Exception setting parameter: %s", e.what());
+      }
     }
 
 
