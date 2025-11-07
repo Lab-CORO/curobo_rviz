@@ -33,6 +33,9 @@ namespace curobo_rviz
         {"--ros-args", "--remap", "__node:=rviz_updata_parameters_node", "--"});
     node_ = std::make_shared<rclcpp::Node>("_", options);
 
+    // Declare base_link parameter with default value
+    node_->declare_parameter<std::string>("base_link", "base_0");
+
     // Try to find ArrowInteractionDisplay, will be set by timer if not immediately available
     this->arrow_interaction_ = nullptr;
 
@@ -513,7 +516,7 @@ namespace curobo_rviz
             // Create marker from voxel grid
             auto marker = std::make_shared<visualization_msgs::msg::Marker>();
             // Get base_link parameter from node, default to "base_link"
-            std::string base_link = "base_link";
+            std::string base_link = "base_0";
             if (node_->has_parameter("base_link")) {
               base_link = node_->get_parameter("base_link").as_string();
             }
