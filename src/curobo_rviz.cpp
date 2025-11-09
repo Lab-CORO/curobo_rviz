@@ -282,7 +282,12 @@ namespace curobo_rviz
       auto pose = this->arrow_interaction_->get_pose();
       goal_request->target_pose = pose;
 
-      
+      // Initialize new fields for backward compatibility
+      goal_request->batch_targets.clear();  // Empty batch_targets means single mode
+      goal_request->hold_partial_pose = false;  // No constraints by default
+      goal_request->hold_vec_weight.clear();  // No constraint weights
+
+
       auto result = this->trajectory_generation_client_->async_send_request(goal_request);
       if (rclcpp::spin_until_future_complete(node_, result) == rclcpp::FutureReturnCode::SUCCESS)
       {
@@ -290,7 +295,7 @@ namespace curobo_rviz
       } else {
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call ");
       }
-        
+
 
     }
 
