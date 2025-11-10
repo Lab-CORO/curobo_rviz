@@ -39,21 +39,21 @@ namespace curobo_rviz
     // Try to find ArrowInteractionDisplay, will be set by timer if not immediately available
     this->arrow_interaction_ = nullptr;
 
-    param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "curobo_gen_traj");
+    param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "unified_planner");
 
-    motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/update_motion_gen_config");
+    motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>("/unified_planner/update_motion_gen_config");
     motion_gen_config_request_ = std::make_shared<std_srvs::srv::Trigger::Request>();
 
     // action client
     this->action_ptr_ = rclcpp_action::create_client<curobo_msgs::action::SendTrajectory>(
       node_,
-      "/curobo_gen_traj/send_trajectrory");
+      "/unified_planner/execute_trajectory");
 
     // create service client to generate traj
-    this->trajectory_generation_client_ = node_->create_client<curobo_msgs::srv::TrajectoryGeneration>("/curobo_gen_traj/generate_trajectory");
+    this->trajectory_generation_client_ = node_->create_client<curobo_msgs::srv::TrajectoryGeneration>("/unified_planner/generate_trajectory");
 
     // Create service client for getting voxel grid
-    this->get_voxel_grid_client_ = node_->create_client<curobo_msgs::srv::GetVoxelGrid>("/curobo_gen_traj/get_voxel_grid");
+    this->get_voxel_grid_client_ = node_->create_client<curobo_msgs::srv::GetVoxelGrid>("/unified_planner/get_voxel_grid");
 
     // Create publisher for voxel grid visualization
     this->voxel_marker_pub_ = node_->create_publisher<visualization_msgs::msg::Marker>("/visualise_voxel_grid", 10);
@@ -63,7 +63,7 @@ namespace curobo_rviz
     connect(obstacle_update_timer_, &QTimer::timeout, this, &RvizArgsPanel::updateObstaclesFromTimer);
 
     // Create service client for setting robot strategy
-    this->set_robot_strategy_client_ = node_->create_client<std_srvs::srv::Trigger>("/curobo_gen_traj/set_robot_strategy");
+    this->set_robot_strategy_client_ = node_->create_client<std_srvs::srv::Trigger>("/unified_planner/set_robot_strategy");
     current_robot_strategy_ = "";
 
     // Connect SpinBox and DoubleSpinBox to slots
