@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>465</width>
-    <height>373</height>
+    <width>461</width>
+    <height>367</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -255,7 +255,7 @@
      <x>0</x>
      <y>80</y>
      <width>454</width>
-     <height>41</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="title">
@@ -271,15 +271,15 @@
      </rect>
     </property>
     <property name="text">
-     <string>Robot Strategy:</string>
+     <string>Robot :</string>
     </property>
    </widget>
    <widget class="QComboBox" name="comboBoxRobotStrategy">
     <property name="geometry">
      <rect>
-      <x>95</x>
-      <y>22</y>
-      <width>200</width>
+      <x>0</x>
+      <y>30</y>
+      <width>141</width>
       <height>25</height>
      </rect>
     </property>
@@ -294,25 +294,61 @@
      </property>
     </item>
    </widget>
-   <widget class="QLabel" name="labelStrategyStatus">
+   <widget class="QLabel" name="labelTrajectoryType">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>25</y>
-      <width>140</width>
+      <x>170</x>
+      <y>10</y>
+      <width>121</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string></string>
+     <string>Trajectory type</string>
     </property>
+   </widget>
+   <widget class="QComboBox" name="comboBoxTrajectoryType">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>30</y>
+      <width>141</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+    <property name="currentText">
+     <string>Classic (MotionGen)</string>
+    </property>
+    <item>
+     <property name="text">
+      <string>Classic (MotionGen)</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>MPC (Real-time)</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Batch (Multiple traj)</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Constrained</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QGroupBox" name="obstacleUpdateGroupBox">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>130</y>
+     <y>140</y>
      <width>454</width>
      <height>65</height>
     </rect>

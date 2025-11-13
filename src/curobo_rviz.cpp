@@ -66,6 +66,10 @@ namespace curobo_rviz
     this->set_robot_strategy_client_ = node_->create_client<std_srvs::srv::Trigger>("/unified_planner/set_robot_strategy");
     current_robot_strategy_ = "";
 
+    // Create service client for setting planner type
+    this->set_planner_client_ = node_->create_client<curobo_msgs::srv::SetPlanner>("/unified_planner/set_planner");
+    current_planner_type_ = 0; // Default to CLASSIC
+
     // Connect SpinBox and DoubleSpinBox to slots
     connect(ui_->doubleSpinBoxTimeDilationFactor, SIGNAL(valueChanged(double)), this, SLOT(updateTimeDilationFactor(double)));
     connect(ui_->doubleSpinBoxVoxelSize, SIGNAL(valueChanged(double)), this, SLOT(updateVoxelSize(double)));
@@ -143,6 +147,17 @@ namespace curobo_rviz
 
     // Connect robot strategy controls
     connect(ui_->comboBoxRobotStrategy, &QComboBox::currentTextChanged, this, &RvizArgsPanel::on_comboBoxRobotStrategy_currentTextChanged);
+
+    // Connect planner type controls
+    connect(ui_->comboBoxTrajectoryType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &RvizArgsPanel::on_comboBoxTrajectoryType_currentIndexChanged);
+
+    // Create MPC goal publisher for real-time tracking
+    this->mpc_goal_pub_ = node_->create_publisher<geometry_msgs::msg::Pose>("/unified_planner/mpc_goal", 10);
+
+    // Create timer for MPC goal publishing (10Hz), but don't start it yet
+    mpc_goal_publisher_timer_ = new QTimer(this);
+    connect(mpc_goal_publisher_timer_, &QTimer::timeout, this, &RvizArgsPanel::publishMpcGoal);
+    is_mpc_tracking_active_ = false;
   }
 
   RvizArgsPanel::~RvizArgsPanel()
@@ -226,6 +241,14 @@ namespace curobo_rviz
     }
 
     void RvizArgsPanel::on_sendTrajectory_clicked(){
+      // Publish marker pose ONCE to MPC goal topic
+      if (arrow_interaction_) {
+        auto marker_pose = arrow_interaction_->get_pose();
+        mpc_goal_pub_->publish(marker_pose);
+        RCLCPP_INFO(node_->get_logger(), "Published goal pose once for execution");
+      } else {
+        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available");
+      }
 
       auto goal_request = curobo_msgs::action::SendTrajectory::Goal();
       auto send_goal_options = rclcpp_action::Client<curobo_msgs::action::SendTrajectory>::SendGoalOptions();
@@ -237,11 +260,18 @@ namespace curobo_rviz
       ui_->sendTrajectory->setEnabled(false);
       ui_->generateTrajectory->setEnabled(false);
       ui_->stopRobot->setEnabled(true);
-      
+
 
     }
 
     void RvizArgsPanel::result_callback(const rclcpp_action::ClientGoalHandle<curobo_msgs::action::SendTrajectory>::WrappedResult & result){
+      // Stop MPC tracking timer if active
+      if (is_mpc_tracking_active_) {
+        mpc_goal_publisher_timer_->stop();
+        is_mpc_tracking_active_ = false;
+        RCLCPP_INFO(node_->get_logger(), "Stopped MPC tracking mode");
+      }
+
       switch (result.code) {
         case rclcpp_action::ResultCode::SUCCEEDED:
           RCLCPP_ERROR(node_->get_logger(), "Goal was succeeded");
@@ -295,6 +325,64 @@ namespace curobo_rviz
     }
 
     void RvizArgsPanel::on_generateAndSend_clicked(){
+      if (!arrow_interaction_) {
+        RCLCPP_WARN(node_->get_logger(), "Arrow marker not available");
+        return;
+      }
+
+      // Check if MPC planner is selected (planner_type == 1)
+      if (current_planner_type_ == 1) {
+        // MPC Mode: Start continuous tracking
+        RCLCPP_INFO(node_->get_logger(), "Starting MPC tracking mode (10Hz goal updates)");
+
+        // First, call generate_trajectory to initialize MPC
+        auto gen_request = std::make_shared<curobo_msgs::srv::TrajectoryGeneration::Request>();
+        gen_request->target_pose = arrow_interaction_->get_pose();
+
+        auto gen_future = trajectory_generation_client_->async_send_request(gen_request,
+          [this](rclcpp::Client<curobo_msgs::srv::TrajectoryGeneration>::SharedFuture future) {
+            auto response = future.get();
+            if (response->success) {
+              RCLCPP_INFO(node_->get_logger(), "MPC initialized successfully");
+
+              // Start continuous goal publishing at 10Hz
+              is_mpc_tracking_active_ = true;
+              mpc_goal_publisher_timer_->start(100); // 100ms = 10Hz
+
+              // Publish first goal immediately
+              publishMpcGoal();
+
+              // Start execution action
+              auto goal_request = curobo_msgs::action::SendTrajectory::Goal();
+              auto send_goal_options = rclcpp_action::Client<curobo_msgs::action::SendTrajectory>::SendGoalOptions();
+
+              send_goal_options.goal_response_callback = std::bind(&RvizArgsPanel::goal_response_callback, this, std::placeholders::_1);
+              send_goal_options.result_callback = std::bind(&RvizArgsPanel::result_callback, this, std::placeholders::_1);
+
+              action_ptr_->async_send_goal(goal_request, send_goal_options);
+
+              ui_->sendTrajectory->setEnabled(false);
+              ui_->generateTrajectory->setEnabled(false);
+              ui_->stopRobot->setEnabled(true);
+
+            } else {
+              RCLCPP_ERROR(node_->get_logger(), "MPC initialization failed: %s", response->message.c_str());
+            }
+          });
+
+      } else {
+        // Classic Mode: Generate trajectory and execute once
+        RCLCPP_INFO(node_->get_logger(), "Classic mode: generate and execute once");
+
+        // Call generate_trajectory
+        on_generateTrajectory_clicked();
+
+        // Wait briefly for generation to complete, then execute
+        // Note: In a production system, you'd want to chain these properly with callbacks
+        QTimer::singleShot(500, this, [this]() {
+          on_sendTrajectory_clicked();
+        });
+      }
     }
     void RvizArgsPanel::on_stopRobot_clicked(){
       auto future_cancel = action_ptr_->async_cancel_goal(this->goal_handle_);
@@ -593,15 +681,9 @@ namespace curobo_rviz
 
       std::string new_strategy = text.toStdString();
 
-      // Update status label
-      ui_->labelStrategyStatus->setText("Switching...");
-      ui_->labelStrategyStatus->setStyleSheet("QLabel { color : orange; }");
-
       // Set the robot_type parameter
       if (!param_client_->wait_for_service(std::chrono::seconds(1))) {
         RCLCPP_WARN(node_->get_logger(), "Parameter service not available");
-        ui_->labelStrategyStatus->setText("Service unavailable");
-        ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
         return;
       }
 
@@ -613,8 +695,6 @@ namespace curobo_rviz
         // Call the set_robot_strategy service
         if (!set_robot_strategy_client_->wait_for_service(std::chrono::seconds(1))) {
           RCLCPP_WARN(node_->get_logger(), "SetRobotStrategy service not available");
-          ui_->labelStrategyStatus->setText("Service unavailable");
-          ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
           return;
         }
 
@@ -627,28 +707,94 @@ namespace curobo_rviz
 
               if (response->success) {
                 current_robot_strategy_ = new_strategy;
-                ui_->labelStrategyStatus->setText(QString::fromStdString(new_strategy));
-                ui_->labelStrategyStatus->setStyleSheet("QLabel { color : green; }");
                 RCLCPP_INFO(node_->get_logger(), "Successfully switched to strategy: %s", new_strategy.c_str());
                 RCLCPP_INFO(node_->get_logger(), "Service response: %s", response->message.c_str());
               } else {
-                ui_->labelStrategyStatus->setText("Failed");
-                ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
                 RCLCPP_ERROR(node_->get_logger(), "Failed to switch strategy: %s", response->message.c_str());
               }
 
             } catch (const std::exception& e) {
-              ui_->labelStrategyStatus->setText("Error");
-              ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
               RCLCPP_ERROR(node_->get_logger(), "Exception calling set_robot_strategy service: %s", e.what());
             }
           });
 
       } catch (const std::exception& e) {
-        ui_->labelStrategyStatus->setText("Error");
-        ui_->labelStrategyStatus->setStyleSheet("QLabel { color : red; }");
         RCLCPP_ERROR(node_->get_logger(), "Exception setting parameter: %s", e.what());
       }
+    }
+
+    void RvizArgsPanel::on_comboBoxTrajectoryType_currentIndexChanged(int index) {
+      RCLCPP_INFO(node_->get_logger(), "Planner type changed to index: %d", index);
+
+      // Map index to planner type constant
+      uint8_t planner_type = static_cast<uint8_t>(index);
+
+      // Verify planner type is valid
+      if (planner_type > 3) {
+        RCLCPP_ERROR(node_->get_logger(), "Invalid planner type: %d", planner_type);
+        return;
+      }
+
+      // Map planner type to name for logging
+      std::string planner_name;
+      switch (planner_type) {
+        case 0:
+          planner_name = "CLASSIC";
+          break;
+        case 1:
+          planner_name = "MPC";
+          break;
+        case 2:
+          planner_name = "BATCH";
+          break;
+        case 3:
+          planner_name = "CONSTRAINED";
+          break;
+      }
+
+      RCLCPP_INFO(node_->get_logger(), "Switching to planner: %s", planner_name.c_str());
+
+      // Call the set_planner service
+      if (!set_planner_client_->wait_for_service(std::chrono::seconds(1))) {
+        RCLCPP_WARN(node_->get_logger(), "SetPlanner service not available");
+        return;
+      }
+
+      auto request = std::make_shared<curobo_msgs::srv::SetPlanner::Request>();
+      request->planner_type = planner_type;
+
+      auto future = set_planner_client_->async_send_request(request,
+        [this, planner_type, planner_name](rclcpp::Client<curobo_msgs::srv::SetPlanner>::SharedFuture future) {
+          try {
+            auto response = future.get();
+
+            if (response->success) {
+              current_planner_type_ = planner_type;
+              RCLCPP_INFO(node_->get_logger(), "Successfully switched to planner: %s", planner_name.c_str());
+              RCLCPP_INFO(node_->get_logger(), "Service response: %s", response->message.c_str());
+              RCLCPP_INFO(node_->get_logger(), "Previous planner: %s, Current planner: %s",
+                          response->previous_planner.c_str(), response->current_planner.c_str());
+            } else {
+              RCLCPP_ERROR(node_->get_logger(), "Failed to switch planner: %s", response->message.c_str());
+            }
+
+          } catch (const std::exception& e) {
+            RCLCPP_ERROR(node_->get_logger(), "Exception calling set_planner service: %s", e.what());
+          }
+        });
+    }
+
+    void RvizArgsPanel::publishMpcGoal() {
+      if (!is_mpc_tracking_active_ || !arrow_interaction_) {
+        return;
+      }
+
+      // Get current marker pose and publish to MPC goal topic
+      auto marker_pose = arrow_interaction_->get_pose();
+      mpc_goal_pub_->publish(marker_pose);
+
+      // Debug log (can be verbose, use sparingly)
+      // RCLCPP_DEBUG(node_->get_logger(), "Published MPC goal at 10Hz");
     }
 
 

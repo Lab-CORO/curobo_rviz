@@ -23,9 +23,9 @@ namespace add_objects_panel
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
         // create add_objects & remove_objects service
-        add_object_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/curobo_gen_traj/add_object");
+        add_object_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/unified_planner/add_object");
         add_object_request_ = std::make_shared<curobo_msgs::srv::AddObject_Request>();
-        remove_object_client_ = node_->create_client<curobo_msgs::srv::RemoveObject>("/curobo_gen_traj/remove_object");
+        remove_object_client_ = node_->create_client<curobo_msgs::srv::RemoveObject>("/unified_planner/remove_object");
         remove_object_request_ = std::make_shared<curobo_msgs::srv::RemoveObject_Request>();
 
         // create publisher so Display can retrieve the parameters to add objects and remove them
@@ -117,7 +117,7 @@ namespace add_objects_panel
 
         // call Add Objects with parameters
         auto future = add_object_client_->async_send_request(add_object_request_);
-        if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
+        if (rclcpp::spin_until_future_complete(node_, future, std::chrono::seconds(5)) == rclcpp::FutureReturnCode::SUCCESS) {
             auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
 
             if (result->success) {
@@ -168,7 +168,7 @@ namespace add_objects_panel
             // send the request to the service to remove the object
             auto future = remove_object_client_->async_send_request(remove_object_request_);
 
-            if (rclcpp::spin_until_future_complete(node_, future) == rclcpp::FutureReturnCode::SUCCESS) {
+            if (rclcpp::spin_until_future_complete(node_, future, std::chrono::seconds(5)) == rclcpp::FutureReturnCode::SUCCESS) {
                 auto result = future.get(); // can only call future.get() once https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
                 
                 if (result->success) {
