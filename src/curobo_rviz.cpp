@@ -151,6 +151,9 @@ namespace curobo_rviz
     // Connect planner type controls
     connect(ui_->comboBoxTrajectoryType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &RvizArgsPanel::on_comboBoxTrajectoryType_currentIndexChanged);
 
+    // Connect stop robot button
+    connect(ui_->stopRobot, &QPushButton::clicked, this, &RvizArgsPanel::on_stopRobot_clicked);
+
     // Create MPC goal publisher for real-time tracking
     this->mpc_goal_pub_ = node_->create_publisher<geometry_msgs::msg::Pose>("/unified_planner/mpc_goal", 10);
 
@@ -385,12 +388,29 @@ namespace curobo_rviz
       }
     }
     void RvizArgsPanel::on_stopRobot_clicked(){
-      auto future_cancel = action_ptr_->async_cancel_goal(this->goal_handle_);
-      if (rclcpp::spin_until_future_complete(node_, future_cancel) == rclcpp::FutureReturnCode::SUCCESS){
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Succeeded to cancel goal");
-      } else {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to cancel goal");
+      // Stop MPC tracking timer if active
+      if (is_mpc_tracking_active_) {
+        mpc_goal_publisher_timer_->stop();
+        is_mpc_tracking_active_ = false;
+        RCLCPP_INFO(node_->get_logger(), "Stopped MPC tracking mode");
       }
+
+      // Cancel the action goal if it exists and is still active
+      if (goal_handle_) {
+        try {
+          // Use async_cancel_goal without blocking spin
+          // The result_callback will handle the cleanup
+          auto future_cancel = action_ptr_->async_cancel_goal(goal_handle_);
+          RCLCPP_INFO(node_->get_logger(), "Cancel request sent");
+        } catch (const std::exception& e) {
+          RCLCPP_WARN(node_->get_logger(), "Exception during cancel: %s", e.what());
+        }
+      }
+
+      // Re-enable buttons immediately (don't wait for result)
+      ui_->sendTrajectory->setEnabled(true);
+      ui_->generateTrajectory->setEnabled(true);
+      ui_->stopRobot->setEnabled(false);
     }
 
     void RvizArgsPanel::findArrowInteractionDisplay(){
