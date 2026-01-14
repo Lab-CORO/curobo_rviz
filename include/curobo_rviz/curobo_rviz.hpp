@@ -16,6 +16,7 @@
 #include "curobo_msgs/srv/trajectory_generation.hpp"
 #include "curobo_msgs/action/send_trajectory.hpp"
 #include "curobo_msgs/srv/get_voxel_grid.hpp"
+#include "curobo_msgs/srv/set_planner.hpp"
 // #include "curobo_msgs/srv/set_robot_strategy.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/point.hpp"
@@ -79,6 +80,12 @@ namespace curobo_rviz
     // Robot strategy slots
     void on_comboBoxRobotStrategy_currentTextChanged(const QString &text);
 
+    // Planner type slots
+    void on_comboBoxTrajectoryType_currentIndexChanged(int index);
+
+    // MPC tracking slots
+    void publishMpcGoal();  // Timer callback for continuous goal publishing
+
     // Helper methods for quaternion <-> Euler conversion
     void quaternionToEuler(const geometry_msgs::msg::Quaternion& q, double& roll, double& pitch, double& yaw);
     void eulerToQuaternion(double roll, double pitch, double yaw, geometry_msgs::msg::Quaternion& q);
@@ -113,6 +120,15 @@ namespace curobo_rviz
     // Robot strategy members
     rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr set_robot_strategy_client_;
     std::string current_robot_strategy_;
+
+    // Planner type members
+    rclcpp::Client<curobo_msgs::srv::SetPlanner>::SharedPtr set_planner_client_;
+    uint8_t current_planner_type_;
+
+    // MPC tracking members
+    rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr mpc_goal_pub_;
+    QTimer* mpc_goal_publisher_timer_;
+    bool is_mpc_tracking_active_;
 
   };
 } // curobo_rviz
