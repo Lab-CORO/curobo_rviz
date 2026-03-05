@@ -1,5 +1,6 @@
 #include "curobo_rviz/curobo_rviz.hpp"
 #include <cmath>
+#include <unordered_map>
 
 namespace curobo_rviz
 {
@@ -65,6 +66,12 @@ namespace curobo_rviz
     // Create service client for setting robot strategy
     this->set_robot_strategy_client_ = node_->create_client<curobo_msgs::srv::SetRobotStrategy>("/unified_planner/set_robot_strategy");
     current_robot_strategy_ = "";
+
+    // Fetch available strategies from the node and populate the combobox
+    this->get_robot_strategies_client_ = node_->create_client<curobo_msgs::srv::GetRobotStrategies>("/unified_planner/get_robot_strategies");
+    fetch_strategies_timer_ = new QTimer(this);
+    connect(fetch_strategies_timer_, &QTimer::timeout, this, &RvizArgsPanel::fetchStrategies);
+    fetch_strategies_timer_->start(1000);
 
     // Create service client for setting planner type
     this->set_planner_client_ = node_->create_client<curobo_msgs::srv::SetPlanner>("/unified_planner/set_planner");
@@ -148,14 +155,11 @@ namespace curobo_rviz
     findDisplayTimer->start(500); // Check every 500ms until found
 
     // Connect obstacle update controls
-    connect(ui_->pushButtonUpdateObstacles, &QPushButton::clicked, this, &RvizArgsPanel::on_pushButtonUpdateObstacles_clicked);
+    // Note: on_pushButtonUpdateObstacles_clicked is auto-connected by setupUi() — no explicit connect needed
     connect(ui_->spinBoxUpdateFrequency, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &RvizArgsPanel::updateObstacleFrequency);
 
-    // Connect robot strategy controls
-    connect(ui_->comboBoxRobotStrategy, &QComboBox::currentTextChanged, this, &RvizArgsPanel::on_comboBoxRobotStrategy_currentTextChanged);
-
-    // Connect planner type controls
-    connect(ui_->comboBoxTrajectoryType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &RvizArgsPanel::on_comboBoxTrajectoryType_currentIndexChanged);
+    // Note: on_comboBoxRobotStrategy_currentTextChanged and on_comboBoxTrajectoryType_currentIndexChanged
+    // are auto-connected by setupUi() via QMetaObject::connectSlotsByName() — no explicit connect needed
 
     // Connect stop robot button
     connect(ui_->stopRobot, &QPushButton::clicked, this, &RvizArgsPanel::on_stopRobot_clicked);
@@ -702,53 +706,65 @@ namespace curobo_rviz
       on_pushButtonUpdateObstacles_clicked();
     }
 
-    void RvizArgsPanel::on_comboBoxRobotStrategy_currentTextChanged(const QString &text) {
-      RCLCPP_INFO(node_->get_logger(), "Robot strategy changed to: %s", text.toStdString().c_str());
+    void RvizArgsPanel::fetchStrategies() {
+      if (!get_robot_strategies_client_->service_is_ready()) {
+        return;  // planner node not up yet — timer will retry
+      }
 
-      std::string new_strategy = text.toStdString();
+      auto request = std::make_shared<curobo_msgs::srv::GetRobotStrategies::Request>();
+      get_robot_strategies_client_->async_send_request(request,
+        [this](rclcpp::Client<curobo_msgs::srv::GetRobotStrategies>::SharedFuture future) {
+          auto response = future.get();
+          if (!response->success) return;
 
-      // Set the robot_type parameter
-      if (!param_client_->wait_for_service(std::chrono::seconds(1))) {
-        RCLCPP_WARN(node_->get_logger(), "Parameter service not available");
+          QMetaObject::invokeMethod(this, [this, response]() {
+            QSignalBlocker blocker(ui_->comboBoxRobotStrategy);
+            ui_->comboBoxRobotStrategy->clear();
+            for (size_t i = 0; i < response->strategy_names.size(); ++i) {
+              ui_->comboBoxRobotStrategy->addItem(
+                QString::fromStdString(response->strategy_names[i]),
+                QVariant(static_cast<uint>(response->strategy_ids[i])));
+            }
+            int idx = ui_->comboBoxRobotStrategy->findData(
+              QVariant(static_cast<uint>(response->current_strategy_id)));
+            if (idx >= 0) ui_->comboBoxRobotStrategy->setCurrentIndex(idx);
+            current_robot_strategy_ = response->current_strategy_name;
+          }, Qt::QueuedConnection);
+
+          fetch_strategies_timer_->stop();
+        });
+    }
+
+    void RvizArgsPanel::on_comboBoxRobotStrategy_currentTextChanged(const QString &/*text*/) {
+      uint8_t strategy_id = static_cast<uint8_t>(
+        ui_->comboBoxRobotStrategy->currentData().toUInt());
+      std::string strategy_name = ui_->comboBoxRobotStrategy->currentText().toStdString();
+
+      RCLCPP_INFO(node_->get_logger(), "Switching to strategy: %s (id=%u)",
+                  strategy_name.c_str(), strategy_id);
+
+      if (!set_robot_strategy_client_->service_is_ready()) {
+        RCLCPP_WARN(node_->get_logger(), "SetRobotStrategy service not available");
         return;
       }
 
-      try {
-        // Set the robot_type parameter
-        // param_client_->set_parameters({rclcpp::Parameter("robot_type", new_strategy)});
-        // RCLCPP_INFO(node_->get_logger(), "Set robot_type parameter to: %s", new_strategy.c_str());
+      auto request = std::make_shared<curobo_msgs::srv::SetRobotStrategy::Request>();
+      request->robot_strategy = strategy_id;
 
-        // Call the set_robot_strategy service
-        if (!set_robot_strategy_client_->wait_for_service(std::chrono::seconds(1))) {
-          RCLCPP_WARN(node_->get_logger(), "SetRobotStrategy service not available");
-          return;
-        }
-        auto goal_request = std::make_shared<curobo_msgs::srv::TrajectoryGeneration::Request>();
-
-        auto request = std::make_shared<curobo_msgs::srv::SetRobotStrategy::Request>();
-        // request.robot_strategy=new_strategy;
-
-        auto future = set_robot_strategy_client_->async_send_request(request,
-          [this, new_strategy](rclcpp::Client<curobo_msgs::srv::SetRobotStrategy>::SharedFuture future) {
-            try {
-              auto response = future.get();
-
-              if (response->success) {
-                current_robot_strategy_ = new_strategy;
-                RCLCPP_INFO(node_->get_logger(), "Successfully switched to strategy: %s", new_strategy.c_str());
-                RCLCPP_INFO(node_->get_logger(), "Service response: %s", response->message.c_str());
-              } else {
-                RCLCPP_ERROR(node_->get_logger(), "Failed to switch strategy: %s", response->message.c_str());
-              }
-
-            } catch (const std::exception& e) {
-              RCLCPP_ERROR(node_->get_logger(), "Exception calling set_robot_strategy service: %s", e.what());
+      set_robot_strategy_client_->async_send_request(request,
+        [this, strategy_name](rclcpp::Client<curobo_msgs::srv::SetRobotStrategy>::SharedFuture future) {
+          try {
+            auto response = future.get();
+            if (response->success) {
+              current_robot_strategy_ = strategy_name;
+              RCLCPP_INFO(node_->get_logger(), "Strategy switched: %s", response->message.c_str());
+            } else {
+              RCLCPP_ERROR(node_->get_logger(), "Failed to switch strategy: %s", response->message.c_str());
             }
-          });
-
-      } catch (const std::exception& e) {
-        RCLCPP_ERROR(node_->get_logger(), "Exception setting parameter: %s", e.what());
-      }
+          } catch (const std::exception& e) {
+            RCLCPP_ERROR(node_->get_logger(), "Exception: %s", e.what());
+          }
+        });
     }
 
     void RvizArgsPanel::fetchPlanners() {

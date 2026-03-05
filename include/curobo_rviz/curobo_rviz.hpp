@@ -19,6 +19,7 @@
 #include "curobo_msgs/srv/set_planner.hpp"
 #include "curobo_msgs/srv/get_planners.hpp"
 #include "curobo_msgs/srv/set_robot_strategy.hpp"
+#include "curobo_msgs/srv/get_robot_strategies.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/point.hpp"
 
@@ -80,6 +81,7 @@ namespace curobo_rviz
 
     // Robot strategy slots
     void on_comboBoxRobotStrategy_currentTextChanged(const QString &text);
+    void fetchStrategies();  // Called by retry timer until service responds
 
     // Planner type slots
     void on_comboBoxTrajectoryType_currentIndexChanged(int index);
@@ -121,6 +123,8 @@ namespace curobo_rviz
 
     // Robot strategy members
     rclcpp::Client<curobo_msgs::srv::SetRobotStrategy>::SharedPtr set_robot_strategy_client_;
+    rclcpp::Client<curobo_msgs::srv::GetRobotStrategies>::SharedPtr get_robot_strategies_client_;
+    QTimer* fetch_strategies_timer_;
     std::string current_robot_strategy_;
 
     // Planner type members
