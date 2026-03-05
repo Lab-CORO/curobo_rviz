@@ -17,7 +17,8 @@
 #include "curobo_msgs/action/send_trajectory.hpp"
 #include "curobo_msgs/srv/get_voxel_grid.hpp"
 #include "curobo_msgs/srv/set_planner.hpp"
-// #include "curobo_msgs/srv/set_robot_strategy.hpp"
+#include "curobo_msgs/srv/get_planners.hpp"
+#include "curobo_msgs/srv/set_robot_strategy.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/point.hpp"
 
@@ -82,6 +83,7 @@ namespace curobo_rviz
 
     // Planner type slots
     void on_comboBoxTrajectoryType_currentIndexChanged(int index);
+    void fetchPlanners();  // Called by retry timer until service responds
 
     // MPC tracking slots
     void publishMpcGoal();  // Timer callback for continuous goal publishing
@@ -118,11 +120,13 @@ namespace curobo_rviz
     double obstacle_update_frequency_;
 
     // Robot strategy members
-    rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr set_robot_strategy_client_;
+    rclcpp::Client<curobo_msgs::srv::SetRobotStrategy>::SharedPtr set_robot_strategy_client_;
     std::string current_robot_strategy_;
 
     // Planner type members
     rclcpp::Client<curobo_msgs::srv::SetPlanner>::SharedPtr set_planner_client_;
+    rclcpp::Client<curobo_msgs::srv::GetPlanners>::SharedPtr get_planners_client_;
+    QTimer* fetch_planners_timer_;
     uint8_t current_planner_type_;
 
     // MPC tracking members

@@ -63,12 +63,18 @@ namespace curobo_rviz
     connect(obstacle_update_timer_, &QTimer::timeout, this, &RvizArgsPanel::updateObstaclesFromTimer);
 
     // Create service client for setting robot strategy
-    this->set_robot_strategy_client_ = node_->create_client<std_srvs::srv::Trigger>("/unified_planner/set_robot_strategy");
+    this->set_robot_strategy_client_ = node_->create_client<curobo_msgs::srv::SetRobotStrategy>("/unified_planner/set_robot_strategy");
     current_robot_strategy_ = "";
 
     // Create service client for setting planner type
     this->set_planner_client_ = node_->create_client<curobo_msgs::srv::SetPlanner>("/unified_planner/set_planner");
     current_planner_type_ = 0; // Default to CLASSIC
+
+    // Fetch available planners from the node and populate the combobox
+    this->get_planners_client_ = node_->create_client<curobo_msgs::srv::GetPlanners>("/unified_planner/get_planners");
+    fetch_planners_timer_ = new QTimer(this);
+    connect(fetch_planners_timer_, &QTimer::timeout, this, &RvizArgsPanel::fetchPlanners);
+    fetch_planners_timer_->start(1000); // retry every second until service responds
 
     // Connect SpinBox and DoubleSpinBox to slots
     connect(ui_->doubleSpinBoxTimeDilationFactor, SIGNAL(valueChanged(double)), this, SLOT(updateTimeDilationFactor(double)));
@@ -709,19 +715,21 @@ namespace curobo_rviz
 
       try {
         // Set the robot_type parameter
-        param_client_->set_parameters({rclcpp::Parameter("robot_type", new_strategy)});
-        RCLCPP_INFO(node_->get_logger(), "Set robot_type parameter to: %s", new_strategy.c_str());
+        // param_client_->set_parameters({rclcpp::Parameter("robot_type", new_strategy)});
+        // RCLCPP_INFO(node_->get_logger(), "Set robot_type parameter to: %s", new_strategy.c_str());
 
         // Call the set_robot_strategy service
         if (!set_robot_strategy_client_->wait_for_service(std::chrono::seconds(1))) {
           RCLCPP_WARN(node_->get_logger(), "SetRobotStrategy service not available");
           return;
         }
+        auto goal_request = std::make_shared<curobo_msgs::srv::TrajectoryGeneration::Request>();
 
-        auto request = std::make_shared<std_srvs::srv::Trigger::Request>();
+        auto request = std::make_shared<curobo_msgs::srv::SetRobotStrategy::Request>();
+        // request.robot_strategy=new_strategy;
 
         auto future = set_robot_strategy_client_->async_send_request(request,
-          [this, new_strategy](rclcpp::Client<std_srvs::srv::Trigger>::SharedFuture future) {
+          [this, new_strategy](rclcpp::Client<curobo_msgs::srv::SetRobotStrategy>::SharedFuture future) {
             try {
               auto response = future.get();
 
@@ -743,36 +751,44 @@ namespace curobo_rviz
       }
     }
 
-    void RvizArgsPanel::on_comboBoxTrajectoryType_currentIndexChanged(int index) {
-      RCLCPP_INFO(node_->get_logger(), "Planner type changed to index: %d", index);
-
-      // Map index to planner type constant
-      uint8_t planner_type = static_cast<uint8_t>(index);
-
-      // Verify planner type is valid
-      if (planner_type > 3) {
-        RCLCPP_ERROR(node_->get_logger(), "Invalid planner type: %d", planner_type);
-        return;
+    void RvizArgsPanel::fetchPlanners() {
+      if (!get_planners_client_->service_is_ready()) {
+        return;  // planner node not up yet — timer will retry
       }
 
-      // Map planner type to name for logging
-      std::string planner_name;
-      switch (planner_type) {
-        case 0:
-          planner_name = "CLASSIC";
-          break;
-        case 1:
-          planner_name = "MPC";
-          break;
-        case 2:
-          planner_name = "BATCH";
-          break;
-        case 3:
-          planner_name = "CONSTRAINED";
-          break;
-      }
+      auto request = std::make_shared<curobo_msgs::srv::GetPlanners::Request>();
+      get_planners_client_->async_send_request(request,
+        [this](rclcpp::Client<curobo_msgs::srv::GetPlanners>::SharedFuture future) {
+          auto response = future.get();
+          if (!response->success) return;
 
-      RCLCPP_INFO(node_->get_logger(), "Switching to planner: %s", planner_name.c_str());
+          // Marshal to Qt main thread
+          QMetaObject::invokeMethod(this, [this, response]() {
+            QSignalBlocker blocker(ui_->comboBoxTrajectoryType);
+            ui_->comboBoxTrajectoryType->clear();
+            for (size_t i = 0; i < response->planner_names.size(); ++i) {
+              ui_->comboBoxTrajectoryType->addItem(
+                QString::fromStdString(response->planner_names[i]),
+                QVariant(static_cast<uint>(response->planner_ids[i])));
+            }
+            // Select current planner
+            int idx = ui_->comboBoxTrajectoryType->findData(
+              QVariant(static_cast<uint>(response->current_planner_id)));
+            if (idx >= 0) ui_->comboBoxTrajectoryType->setCurrentIndex(idx);
+            current_planner_type_ = response->current_planner_id;
+          }, Qt::QueuedConnection);
+
+          fetch_planners_timer_->stop();  // success — no more retries
+        });
+    }
+
+    void RvizArgsPanel::on_comboBoxTrajectoryType_currentIndexChanged(int /*index*/) {
+      uint8_t planner_type = static_cast<uint8_t>(
+        ui_->comboBoxTrajectoryType->currentData().toUInt());
+      std::string planner_name = ui_->comboBoxTrajectoryType->currentText().toStdString();
+
+      RCLCPP_INFO(node_->get_logger(), "Switching to planner: %s (id=%u)",
+                  planner_name.c_str(), planner_type);
 
       // Call the set_planner service
       if (!set_planner_client_->wait_for_service(std::chrono::seconds(1))) {
