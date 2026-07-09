@@ -22,10 +22,15 @@ namespace add_objects_panel
         {"--ros-args", "--remap", "__node:=rviz_add_objects_node", "--"});
         node_ = std::make_shared<rclcpp::Node>("_", options);
 
+        // Target planner node name is configurable (was hard-coded to "unified_planner").
+        // Defaults to "curobo_trajectory_planner" (the leeloo planner node).
+        node_->declare_parameter<std::string>("planner_node_name", "curobo_trajectory_planner");
+        const std::string planner_ns = "/" + node_->get_parameter("planner_node_name").as_string() + "/";
+
         // create add_objects & remove_objects service
-        add_object_client_ = node_->create_client<curobo_msgs::srv::AddObject>("/unified_planner/add_object");
+        add_object_client_ = node_->create_client<curobo_msgs::srv::AddObject>(planner_ns + "add_object");
         add_object_request_ = std::make_shared<curobo_msgs::srv::AddObject_Request>();
-        remove_object_client_ = node_->create_client<curobo_msgs::srv::RemoveObject>("/unified_planner/remove_object");
+        remove_object_client_ = node_->create_client<curobo_msgs::srv::RemoveObject>(planner_ns + "remove_object");
         remove_object_request_ = std::make_shared<curobo_msgs::srv::RemoveObject_Request>();
 
         // create publisher so Display can retrieve the parameters to add objects and remove them

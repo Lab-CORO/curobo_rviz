@@ -19,6 +19,7 @@
 #include "curobo_msgs/srv/set_planner.hpp"
 #include "curobo_msgs/srv/set_robot_strategy.hpp"
 #include "visualization_msgs/msg/marker.hpp"
+#include "visualization_msgs/msg/marker_array.hpp"
 #include "geometry_msgs/msg/point.hpp"
 
 // RVIZ2
@@ -114,6 +115,8 @@ namespace curobo_rviz
     // Obstacle update members
     rclcpp::Client<curobo_msgs::srv::GetVoxelGrid>::SharedPtr get_voxel_grid_client_;
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr voxel_marker_pub_;
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr voxel_marker_array_pub_;
+    std::string voxel_frame_id_;
     QTimer* obstacle_update_timer_;
     double obstacle_update_frequency_;
 

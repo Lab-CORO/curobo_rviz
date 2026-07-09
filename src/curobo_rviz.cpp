@@ -36,27 +36,45 @@ namespace curobo_rviz
     // Declare base_link parameter with default value
     node_->declare_parameter<std::string>("base_link", "base_0");
 
+    // Target planner node name is configurable (was hard-coded to "unified_planner").
+    // On the leeloo system the planner node is "curobo_trajectory_planner"; override
+    // with the "planner_node_name" parameter on this panel's node
+    // (/rviz_updata_parameters_node) if it differs.
+    node_->declare_parameter<std::string>("planner_node_name", "curobo_trajectory_planner");
+    const std::string planner_node = node_->get_parameter("planner_node_name").as_string();
+    const std::string planner_ns = "/" + planner_node + "/";
+
     // Try to find ArrowInteractionDisplay, will be set by timer if not immediately available
     this->arrow_interaction_ = nullptr;
 
-    param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, "unified_planner");
+    param_client_ = std::make_shared<rclcpp::SyncParametersClient>(node_, planner_node);
 
-    motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>("/unified_planner/update_motion_gen_config");
+    motion_gen_config_client_ = node_->create_client<std_srvs::srv::Trigger>(planner_ns + "update_motion_gen_config");
     motion_gen_config_request_ = std::make_shared<std_srvs::srv::Trigger::Request>();
 
     // action client
     this->action_ptr_ = rclcpp_action::create_client<curobo_msgs::action::SendTrajectory>(
       node_,
-      "/unified_planner/execute_trajectory");
+      planner_ns + "execute_trajectory");
 
     // create service client to generate traj
-    this->trajectory_generation_client_ = node_->create_client<curobo_msgs::srv::TrajectoryGeneration>("/unified_planner/generate_trajectory");
+    this->trajectory_generation_client_ = node_->create_client<curobo_msgs::srv::TrajectoryGeneration>(planner_ns + "generate_trajectory");
 
     // Create service client for getting voxel grid
-    this->get_voxel_grid_client_ = node_->create_client<curobo_msgs::srv::GetVoxelGrid>("/unified_planner/get_voxel_grid");
+    this->get_voxel_grid_client_ = node_->create_client<curobo_msgs::srv::GetVoxelGrid>(planner_ns + "get_voxel_grid");
 
     // Create publisher for voxel grid visualization
     this->voxel_marker_pub_ = node_->create_publisher<visualization_msgs::msg::Marker>("/visualise_voxel_grid", 10);
+
+    // Frame the voxel grid markers are expressed in (the planner returns an empty
+    // header, and the old "base_0" default does not exist in the leeloo TF tree).
+    node_->declare_parameter<std::string>("voxel_frame_id", "dsr01/base_link");
+    voxel_frame_id_ = node_->get_parameter("voxel_frame_id").as_string();
+
+    // MarkerArray publisher for the voxel grid, latched (transient_local) so an
+    // RViz MarkerArray display shows the last grid even if it connects afterwards.
+    this->voxel_marker_array_pub_ = node_->create_publisher<visualization_msgs::msg::MarkerArray>(
+        "/visualise_voxel_grid_array", rclcpp::QoS(1).transient_local());
 
     // Create timer for automatic obstacle updates
     obstacle_update_timer_ = new QTimer(this);
@@ -67,7 +85,7 @@ namespace curobo_rviz
     current_robot_strategy_ = "";
 
     // Create service client for setting planner type
-    this->set_planner_client_ = node_->create_client<curobo_msgs::srv::SetPlanner>("/unified_planner/set_planner");
+    this->set_planner_client_ = node_->create_client<curobo_msgs::srv::SetPlanner>(planner_ns + "set_planner");
     current_planner_type_ = 0; // Default to CLASSIC
 
     // Connect SpinBox and DoubleSpinBox to slots
@@ -195,7 +213,16 @@ namespace curobo_rviz
     void RvizArgsPanel::updateTimeDilationFactor(double value)
     {
         time_dilation_factor_ = value;
-       
+
+        // Guard against a hard hang: SyncParametersClient::set_parameters_atomically
+        // blocks with an infinite timeout. This slot fires during RViz config load
+        // (spinbox setValue -> valueChanged), so if the planner node is not up it would
+        // freeze the whole RViz load. Only call when the parameter service is ready.
+        if (!param_client_->service_is_ready()) {
+            RCLCPP_WARN(node_->get_logger(),
+                "Planner parameter service not available; skipping time_dilation_factor update");
+            return;
+        }
         // set parameters on parameter server
         param_client_->set_parameters_atomically({rclcpp::Parameter("time_dilation_factor", time_dilation_factor_)});
         RCLCPP_INFO(node_->get_logger(), "Time dilation factor set to %.2f", time_dilation_factor_);
@@ -620,52 +647,60 @@ namespace curobo_rviz
         [this](rclcpp::Client<curobo_msgs::srv::GetVoxelGrid>::SharedFuture future) {
           try {
             auto response = future.get();
-
-            // Create marker from voxel grid
-            auto marker = std::make_shared<visualization_msgs::msg::Marker>();
-            // Get base_link parameter from node, default to "base_link"
-            std::string base_link = "base_0";
-            if (node_->has_parameter("base_link")) {
-              base_link = node_->get_parameter("base_link").as_string();
-            }
-            marker->header.frame_id = base_link;
-            marker->header.stamp = node_->get_clock()->now();
-            marker->ns = "voxel_grid";
-            marker->id = 0;
-            marker->type = visualization_msgs::msg::Marker::CUBE_LIST;
-            marker->action = visualization_msgs::msg::Marker::ADD;
-
             auto& voxel_grid = response->voxel_grid;
-            marker->scale.x = voxel_grid.resolutions.x;
-            marker->scale.y = voxel_grid.resolutions.y;
-            marker->scale.z = voxel_grid.resolutions.z;
 
-            // Set marker color (green)
-            marker->color.r = 0.0;
-            marker->color.g = 1.0;
-            marker->color.b = 0.0;
-            marker->color.a = 1.0;
+            // Build a MarkerArray with a single CUBE_LIST holding one cube per
+            // occupied voxel (efficient for the thousands a dense grid returns).
+            // A fixed ns+id means each new publish REPLACES the previous grid in
+            // place, so no DELETEALL is needed (and adding one would collide on the
+            // same (ns, id) and trip RViz's duplicate-marker check).
+            visualization_msgs::msg::MarkerArray marker_array;
+            const auto stamp = node_->get_clock()->now();
+            // Prefer the frame the service provides; fall back to the configured one.
+            std::string frame_id = voxel_grid.header.frame_id.empty()
+                                       ? voxel_frame_id_
+                                       : voxel_grid.header.frame_id;
 
-            // Convert voxel grid data into cubes
+            visualization_msgs::msg::Marker marker;
+            marker.header.frame_id = frame_id;
+            marker.header.stamp = stamp;
+            marker.ns = "voxel_grid";
+            marker.id = 0;
+            marker.type = visualization_msgs::msg::Marker::CUBE_LIST;
+            marker.action = visualization_msgs::msg::Marker::ADD;
+            marker.pose.orientation.w = 1.0;
+            marker.scale.x = voxel_grid.resolutions.x;
+            marker.scale.y = voxel_grid.resolutions.y;
+            marker.scale.z = voxel_grid.resolutions.z;
+            marker.color.r = 0.0;
+            marker.color.g = 1.0;
+            marker.color.b = 0.0;
+            marker.color.a = 1.0;
+
+            // Dense C-order grid (linear = i*size_y*size_z + j*size_z + k).
             size_t index = 0;
-            for (size_t x = 0; x < voxel_grid.size_z; x++) {
-              for (size_t y = 0; y < voxel_grid.size_y; y++) {
-                for (size_t z = 0; z < voxel_grid.size_x; z++) {
-                  if (voxel_grid.data[index] > 0) {
+            for (size_t i = 0; i < voxel_grid.size_x; i++) {
+              for (size_t j = 0; j < voxel_grid.size_y; j++) {
+                for (size_t k = 0; k < voxel_grid.size_z; k++) {
+                  if (index < voxel_grid.data.size() && voxel_grid.data[index] > 0) {
                     geometry_msgs::msg::Point point;
-                    point.x = voxel_grid.origin.x + x * voxel_grid.resolutions.x;
-                    point.y = voxel_grid.origin.y + y * voxel_grid.resolutions.y;
-                    point.z = voxel_grid.origin.z + z * voxel_grid.resolutions.z;
-                    marker->points.push_back(point);
+                    // Cube centre = origin + (idx + 0.5) * resolution.
+                    point.x = voxel_grid.origin.x + (i + 0.5) * voxel_grid.resolutions.x;
+                    point.y = voxel_grid.origin.y + (j + 0.5) * voxel_grid.resolutions.y;
+                    point.z = voxel_grid.origin.z + (k + 0.5) * voxel_grid.resolutions.z;
+                    marker.points.push_back(point);
                   }
                   index++;
                 }
               }
             }
+            marker_array.markers.push_back(marker);
 
-            // Publish marker
-            voxel_marker_pub_->publish(*marker);
-            RCLCPP_INFO(node_->get_logger(), "Published voxel grid visualization with %zu occupied voxels", marker->points.size());
+            // Publish MarkerArray (latched).
+            voxel_marker_array_pub_->publish(marker_array);
+            RCLCPP_INFO(node_->get_logger(),
+                "Published voxel grid MarkerArray in frame '%s' with %zu occupied voxels",
+                frame_id.c_str(), marker.points.size());
 
           } catch (const std::exception& e) {
             RCLCPP_ERROR(node_->get_logger(), "Failed to get voxel grid: %s", e.what());
