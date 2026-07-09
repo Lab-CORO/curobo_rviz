@@ -63,7 +63,7 @@ namespace curobo_rviz
     connect(obstacle_update_timer_, &QTimer::timeout, this, &RvizArgsPanel::updateObstaclesFromTimer);
 
     // Create service client for setting robot strategy
-    this->set_robot_strategy_client_ = node_->create_client<std_srvs::srv::Trigger>("/unified_planner/set_robot_strategy");
+    this->set_robot_strategy_client_ = node_->create_client<curobo_msgs::srv::SetRobotStrategy>("/unified_planner/set_robot_strategy");
     current_robot_strategy_ = "";
 
     // Create service client for setting planner type
@@ -697,31 +697,25 @@ namespace curobo_rviz
     }
 
     void RvizArgsPanel::on_comboBoxRobotStrategy_currentTextChanged(const QString &text) {
-      RCLCPP_INFO(node_->get_logger(), "Robot strategy changed to: %s", text.toStdString().c_str());
+      RCLCPP_INFO(node_->get_logger(), "Control strategy changed to: %s", text.toStdString().c_str());
 
       std::string new_strategy = text.toStdString();
 
-      // Set the robot_type parameter
-      if (!param_client_->wait_for_service(std::chrono::seconds(1))) {
-        RCLCPP_WARN(node_->get_logger(), "Parameter service not available");
-        return;
-      }
-
       try {
-        // Set the robot_type parameter
-        param_client_->set_parameters({rclcpp::Parameter("robot_type", new_strategy)});
-        RCLCPP_INFO(node_->get_logger(), "Set robot_type parameter to: %s", new_strategy.c_str());
-
-        // Call the set_robot_strategy service
+        // Call the set_robot_strategy service with the control-strategy KEY
+        // (emulator / joint_speed / joint_pose). The service also updates the
+        // node's `control_strategy` parameter, so no separate parameter set is
+        // needed here (the old `robot_type` parameter no longer exists).
         if (!set_robot_strategy_client_->wait_for_service(std::chrono::seconds(1))) {
           RCLCPP_WARN(node_->get_logger(), "SetRobotStrategy service not available");
           return;
         }
 
-        auto request = std::make_shared<std_srvs::srv::Trigger::Request>();
+        auto request = std::make_shared<curobo_msgs::srv::SetRobotStrategy::Request>();
+        request->robot_strategy = new_strategy;
 
         auto future = set_robot_strategy_client_->async_send_request(request,
-          [this, new_strategy](rclcpp::Client<std_srvs::srv::Trigger>::SharedFuture future) {
+          [this, new_strategy](rclcpp::Client<curobo_msgs::srv::SetRobotStrategy>::SharedFuture future) {
             try {
               auto response = future.get();
 
@@ -739,7 +733,7 @@ namespace curobo_rviz
           });
 
       } catch (const std::exception& e) {
-        RCLCPP_ERROR(node_->get_logger(), "Exception setting parameter: %s", e.what());
+        RCLCPP_ERROR(node_->get_logger(), "Exception calling set_robot_strategy: %s", e.what());
       }
     }
 

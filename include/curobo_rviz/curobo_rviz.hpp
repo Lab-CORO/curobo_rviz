@@ -17,7 +17,7 @@
 #include "curobo_msgs/action/send_trajectory.hpp"
 #include "curobo_msgs/srv/get_voxel_grid.hpp"
 #include "curobo_msgs/srv/set_planner.hpp"
-// #include "curobo_msgs/srv/set_robot_strategy.hpp"
+#include "curobo_msgs/srv/set_robot_strategy.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/point.hpp"
 
@@ -117,8 +117,8 @@ namespace curobo_rviz
     QTimer* obstacle_update_timer_;
     double obstacle_update_frequency_;
 
-    // Robot strategy members
-    rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr set_robot_strategy_client_;
+    // Control strategy members (emulator / joint_speed / joint_pose — string key)
+    rclcpp::Client<curobo_msgs::srv::SetRobotStrategy>::SharedPtr set_robot_strategy_client_;
     std::string current_robot_strategy_;
 
     // Planner type members

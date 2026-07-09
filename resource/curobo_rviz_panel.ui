@@ -285,12 +285,17 @@
     </property>
     <item>
      <property name="text">
-      <string>doosan_m1013</string>
+      <string>joint_speed</string>
      </property>
     </item>
     <item>
      <property name="text">
       <string>emulator</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>joint_pose</string>
      </property>
     </item>
    </widget>
