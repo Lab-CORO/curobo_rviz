@@ -29,6 +29,7 @@ find_package(curobo_msgs REQUIRED)
 
 set(dependencies_pkgs
   rclcpp
+  rclcpp_action
   rcl_interfaces
   std_msgs
   std_srvs
@@ -67,6 +68,7 @@ set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/add_objects_panel.hpp
   include/${PROJECT_NAME}/arrow_interaction.hpp
   include/${PROJECT_NAME}/arrow_interaction_display.hpp
+  include/${PROJECT_NAME}/node_spinner.hpp
 )
 
 # Define ui file

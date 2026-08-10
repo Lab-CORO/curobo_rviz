@@ -13,12 +13,16 @@
   <build_depend>qtbase5-dev</build_depend>
 
   <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
   <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
   <depend>rviz_common</depend>
   <depend>pluginlib</depend>
   <depend>curobo_msgs</depend>
   <depend>rviz_rendering</depend>
   <depend>geometry_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>interactive_markers</depend>
 
   <exec_depend>libqt5-core</exec_depend>
   <exec_depend>libqt5-gui</exec_depend>
